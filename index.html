@@ -1,892 +1,865 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Castle Busters</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a12;color:#e0e0e0;font-family:system-ui,sans-serif;overflow-x:hidden;min-height:100vh}
-.neon-p{color:#ff2d95;text-shadow:0 0 10px #ff2d9555}
-.neon-g{color:#39ff14;text-shadow:0 0 10px #39ff1455}
-#app{max-width:640px;margin:0 auto;min-height:100vh;position:relative}
-.screen{display:none;padding:16px;animation:fadeIn .3s}
-.screen.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.btn{display:inline-block;padding:12px 24px;border:none;border-radius:12px;font-size:16px;font-weight:bold;cursor:pointer;transition:.2s;text-align:center}
-.btn-primary{background:linear-gradient(135deg,#ff2d95,#ff6b35);color:#fff}
-.btn-primary:hover{transform:scale(1.05);box-shadow:0 4px 20px #ff2d9555}
-.btn-secondary{background:linear-gradient(135deg,#39ff14,#00b894);color:#0a0a12}
-.btn-secondary:hover{transform:scale(1.05);box-shadow:0 4px 20px #39ff1455}
-.btn-ghost{background:#1a1a2e;color:#e0e0e0;border:1px solid #333}
-.btn-ghost:hover{background:#252540}
-.btn-danger{background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff}
-.btn-small{padding:6px 14px;font-size:13px;border-radius:8px}
-.card{background:#151523;border:1px solid #252540;border-radius:14px;padding:14px;margin-bottom:10px}
-.card-hero{display:flex;gap:10px;align-items:center}
-.hero-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;background:#1a1a2e;border:2px solid #ff2d9555}
-.title-bar{font-size:22px;font-weight:bold;padding:12px 0;display:flex;align-items:center;gap:8px}
-.stats-bar{display:flex;gap:12px;font-size:13px;padding:8px 0;flex-wrap:wrap}
-.stat-item{background:#11111c;padding:4px 10px;border-radius:8px;border:1px solid #252540}
-.grid-castle{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:10px 0}
-.floor-label{font-size:11px;color:#888;text-align:center;padding:2px}
-.slot{aspect-ratio:1;background:#0d0d18;border:1px solid #252540;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:.2s;position:relative}
-.slot:hover{border-color:#ff2d95;transform:scale(1.08)}
-.slot.built{background:#15152a;border-color:#39ff1455}
-.slot.locked{opacity:.3;cursor:not-allowed}
-.shop-grid{display:grid;grid-template-columns:1fr;gap:8px}
-.shop-item{display:flex;gap:10px;align-items:center;padding:10px;background:#11111c;border-radius:10px;border:1px solid #252540}
-.shop-icon{font-size:28px;width:44px;text-align:center}
-.map-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.map-node{padding:14px 8px;border-radius:12px;text-align:center;cursor:pointer;transition:.2s;font-size:13px}
-.map-node:hover{transform:scale(1.05)}
-.map-node.battle{background:linear-gradient(135deg,#2a1010,#3a1515);border:1px solid #e74c3c55}
-.map-node.shop{background:#10152a;border:1px solid #39ff1455}
-.map-node.castle{background:#1a1025;border:1px solid #ff2d9555}
-.map-node.locked{opacity:.4;cursor:not-allowed}
-.map-node.done{opacity:.6}
-.battle-arena{background:#0d0d18;border-radius:14px;padding:12px;margin-bottom:10px}
-.hp-bar{height:20px;background:#222;border-radius:10px;overflow:hidden;position:relative;margin:4px 0}
-.hp-fill{height:100%;border-radius:10px;transition:.5s;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:#fff}
-.hp-player{background:linear-gradient(90deg,#39ff14,#00b894)}
-.hp-enemy{background:linear-gradient(90deg,#e74c3c,#c0392b)}
-.hero-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.hero-chip{padding:4px 10px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid #333;background:#11111c}
-.hero-chip.active{border-color:#ff2d95;background:#ff2d9522}
-.hero-chip.cooldown{opacity:.4}
-.log-box{max-height:150px;overflow-y:auto;font-size:12px;line-height:1.6;padding:8px;background:#08080f;border-radius:8px;margin-top:8px}
-.log-entry{padding:2px 0;border-bottom:1px solid #15151f}
-.gold-display{color:#ffd700;font-weight:bold}
-.mana-display{color:#00bfff;font-weight:bold}
-.floor-selector{display:flex;gap:4px;margin-bottom:6px}
-.floor-tab{padding:6px 12px;border-radius:8px;font-size:13px;cursor:pointer;background:#11111c;border:1px solid #252540}
-.floor-tab.active{background:#ff2d95;color:#fff;border-color:#ff2d95}
-.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#151523;border:1px solid #ff2d95;padding:10px 20px;border-radius:10px;z-index:999;font-size:14px;display:none}
-.toast.show{display:block;animation:.3s slideDown}
-@keyframes slideDown{from{top:-50px}to{top:16px}}
-.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000a;z-index:99;display:none;align-items:center;justify-content:center;padding:16px}
-.modal-overlay.show{display:flex}
-.modal{background:#151523;border-radius:16px;padding:20px;max-width:400px;width:100%;border:1px solid #252540}
-.result-screen{text-align:center;padding:30px 16px}
-.result-icon{font-size:60px;margin-bottom:10px}
-.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:bold}
-.badge-new{background:#39ff1422;color:#39ff14;border:1px solid #39ff1455}
-.badge-paid{background:#ffd70022;color:#ffd700;border:1px solid #ffd70055}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Castle Busters - интерактивное веб-приложение для управления замками">
+    <meta name="theme-color" content="#2c3e50">
+    <title>Castle Busters | Интерактивное приложение</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #4ecdc4;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --success: #51cf66;
+            --warning: #ffd93d;
+            --danger: #ff6b6b;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        header h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        /* Main Content */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 10px;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 15px;
+            border: 2px solid var(--light);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+        }
+
+        /* Buttons */
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #ff5252);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), #45b7aa);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #40c057;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+
+        /* Castle Display */
+        .castle-display {
+            background: linear-gradient(180deg, #87ceeb 0%, #e0f6ff 100%);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .castle-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.3), transparent);
+            pointer-events: none;
+        }
+
+        .castle-emoji {
+            font-size: 80px;
+            animation: bounce 2s infinite;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .castle-info {
+            position: relative;
+            z-index: 1;
+        }
+
+        .castle-info h3 {
+            font-size: 1.3rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .castle-info p {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--secondary), #45b7aa);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+        }
+
+        .stat-card .label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        /* Results Table */
+        .results-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid var(--light);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--dark), #34495e);
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--light);
+        }
+
+        tbody tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-destroyed {
+            background: var(--success);
+            color: white;
+        }
+
+        .status-standing {
+            background: var(--warning);
+            color: #333;
+        }
+
+        .status-new {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: var(--success);
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-color: var(--secondary);
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-color: var(--warning);
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: var(--danger);
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            padding: 20px;
+            opacity: 0.9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            input[type="text"],
+            input[type="number"],
+            select {
+                min-width: 100%;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--light);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+    </style>
 </head>
 <body>
-<div id="app"></div>
-<div id="toast" class="toast"></div>
-<div id="modal" class="modal-overlay"><div class="modal" id="modalContent"></div></div>
-<script>
-// ====== GAME DATA ======
-const HEROES=[
-{id:'grinchita',icon:'🟢',name:'Гринчита',desc:'Командир замка. Копит энергию — через ход ×2 урон.',costGold:0,atkBase:30,defBase:15,hpBase:120,ability:'charge',abiDesc:'Зарядка ×2 через ход',unlockLvl:true},
-{id:'summer',icon:'🔥',name:'Summer',desc:'Огненный боец. Копит энергию, через ход ×2 урон.',costGold:200,atkBase:35,defBase:10,hpBase:100,ability:'charge',abiDesc:'×2 урон через ход',unlockLvl:false},
-{id:'fantom',icon:'👻',name:'Fantom',desc:'Стелс-воин. Поглощает следующую атаку врага.',costGold:350,atkBase:28,defBase:20,hpBase:110,ability:'stealth',abiDesc:'Поглощает атаку',unlockLvl:false},
-{id:'volt',icon:'⚡',name:'Volt',desc:'Цепная молния бьёт по всем врагам.',costGold:500,atkBase:32,defBase:12,hpBase:95,ability:'chain',abiDesc:'Цепной урон по всем',unlockLvl:false},
-{id:'blade',icon:'⚔️',name:'Blade',desc:'Двойной удар — бьёт дважды за ход.',costGold:700,atkBase:26,defBase:18,hpBase:115,ability:'double',abiDesc:'Двойная атака',unlockLvl:false},
-{id:'titan',icon:'👑',name:'Titan Prime',desc:'Легендарный герой. Массовый урон + щит.',costGold:true,atkBase:50,defBase:30,hpBase:200,ability:'massive',abiDesc:'Массовый удар + щит',unlockLvl:false},
-];
-const BUILDINGS=[
-{id:'tower',icon:'🗼',name:'Башня лучника',desc:'+15 урона/ход',costGold:{1,100},{2,200},{3,400},{4,800}},type:'attack',
-{id:'wall',icon:'🧱',name:'Стена',desc:'+30 защиты замка',costGold:{1,50},{2,120},{3,250},{4,500}},type:'defense',
-{id:'mine',icon:'⛏️',name:'Золотая шахта',desc:'+15 золота/ход',costGold:{1,150},{2,300},{3,600},{4,1200}},type:'economy',
-{id:'barracks',icon:'🏰',name:'Казарма',desc:'+10% к урону героев',costGold:{1,200},{2,400},{3,800},{4,1600}},type:'buff',
-{id:'mage',icon:'🔮',name:'Магбашня',desc:'+5 маны/ход',costGold:{1,180},{2,360},{3,720},{4,1440}},type:'mana',
-];
-const SHOP_ITEMS=[
-{id,'healCastle',icon:'❤️',name:'Ремонт замка',desc:'+200 HP',costGold,80,type,'instant'},
-{id,'healFull',icon:'💚',name:'Полный ремонт',desc:'+500 HP',costGold,180,type,'instant'},
-{id,'manaPot',icon,'🔵',name,'Зелье маны',desc:'+30 маны',costGold,60,type,'instant'},
-{id,'atkBuff',icon,'⚔️',name,'Зелье ярости',desc:'+50% урон на 3 хода',costGold,150,type,'temp'},
-{id,'defBuff',icon,'🛡️',name,'Каменная кожа',desc:'+50% защита на 3 хода',costGold,150,type,'temp'},
-{id,'wallUp',icon,'🧱',name,'Железные стены',desc,'+50 защиты навсегда',costGold,300,type,'permanent'},
-{id,'goldRush',icon,'💰',name,'Сундук золота',desc,'+300 золота',costGold,0,type,'gold',realCost,50},
-];
-const ENEMY_NAMES=['Тёмный Лорд','Огненный Барон','Ледяная Королева','Каменный Гигант','Теневой Маг'];
-const MAX_FLOORS=4;
-const SLOTS_PER_FLOOR=5;
-const CASTLE_BASE_HP=500;
-const MAP_NODES=12;
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🏰 Castle Busters</h1>
+            <p>Интерактивное приложение для управления замками</p>
+        </header>
 
-<!-- ЭКРАН ВЫБОРА ГЕРОЯ -->
-<div id="screen-heroes" class="screen">
-<h2>👥 Выбор героя</h2>
-<p style="color:#888;font-size:13px;margin-bottom:10px">Выбери героя для битвы. Каждый имеет уникальную способность.</p>
-<div id="hero-list"></div>
-<button class="btn btn-primary" onclick="showScreen('menu')">← Назад</button>
-</div>
+        <!-- Alerts Container -->
+        <div id="alerts"></div>
 
-<!-- ЭКРАН МАГАЗИНА -->
-<div id="screen-shop" class="screen">
-<h2>🛒 Магазин</h2>
-<div class="resources">
-<span class="resource gold">💰 <span id="shop-gold">100</span></span>
-<span class="resource mana">💎 <span id="shop-mana">0</span></span>
-</div>
-<h3>⚔️ Юниты</h3>
-<div class="grid" id="shop-units"></div>
-<h3>🏗️ Постройки</h3>
-<div class="grid" id="shop-buildings"></div>
-<h3>✨ Улучшения</h3>
-<div class="grid" id="shop-upgrades"></div>
-<button class="btn btn-primary" onclick="showScreen('menu')">← Назад</button>
-</div>
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left Panel: Control & Display -->
+            <div>
+                <!-- Castle Display -->
+                <div class="card castle-display" id="castleDisplay">
+                    <div class="castle-emoji">🏰</div>
+                    <div class="castle-info">
+                        <h3 id="castleName">Добро пожаловать!</h3>
+                        <p id="castleDescription">Введите название замка и начните управление</p>
+                    </div>
+                </div>
 
-<!-- ЭКРАН ЗАМКА -->
-<div id="screen-castle" class="screen">
-<h2>🏰 Твой замок</h2>
-<div class="resources">
-<span class="resource gold">💰 <span id="castle-gold">100</span></span>
-<span class="resource castle">🛡️ <span id="castle-hp">500</span>/<span id="castle-maxhp">500</span></span>
-</div>
-<div class="castle-view" id="castle-view">
-<p style="text-align:center;color:#666;margin-top:100px">Строй замок вверх — до 4 этажей!<br>Нажми на слот, чтобы построить.</p>
-</div>
-<button class="btn btn-secondary" onclick="buildFloor()">⬆️ Построить этаж (200💰)</button>
-<button class="btn btn-gold" onclick="repairCastle()">🔧 Ремонт (+200 HP, 80💰)</button>
-<button class="btn btn-primary" onclick="showScreen('menu')">← Назад</button>
-</div>
+                <!-- Control Panel -->
+                <div class="card" style="margin-top: 20px;">
+                    <h2>⚙️ Управление</h2>
+                    <div class="control-panel">
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                id="castleNameInput" 
+                                placeholder="Название замка (например: Hogwarts)"
+                                maxlength="50"
+                            >
+                            <button class="btn-primary" onclick="addCastle()">+ Добавить</button>
+                        </div>
 
-<!-- ЭКРАН КАРТЫ -->
-<div id="screen-map" class="screen">
-<h2>🗺️ Карта кампании</h2>
-<p style="color:#888;font-size:13px">Проходи узлы, сражайся с врагами, получай награды.</p>
-<div class="map-container" id="map-container"></div>
-<button class="btn btn-primary" onclick="showScreen('menu')">← Назад</button>
-</div>
+                        <div class="input-group">
+                            <input 
+                                type="number" 
+                                id="powerInput" 
+                                placeholder="Сила разрушения (1-100)"
+                                min="1"
+                                max="100"
+                                value="50"
+                            >
+                            <select id="castleSelect" onchange="loadCastleData()">
+                                <option value="">-- Выберите замок --</option>
+                            </select>
+                            <button class="btn-danger" onclick="destroyCastle()" title="Разрушить выбранный замок">💥</button>
+                        </div>
 
-<!-- ЭКРАН БИТВЫ -->
-<div id="screen-battle" class="screen">
-<h2>⚔️ Битва</h2>
-<div id="turn-indicator">Твой ход</div>
-<div class="combat-area">
-<div class="combat-side" id="combat-player">
-<div style="font-size:40px" id="player-icon">🦸</div>
-<div class="hp-text">HP: <span id="player-hp">100</span></div>
-<div class="bar bar-hp"><div class="bar-fill" id="player-hp-bar" style="width:100%"></div></div>
-<div style="font-size:12px;color:#aaa;margin-top:4px" id="player-name">Гринчита</div>
-</div>
-<div style="font-size:30px;align-self:center;padding:0 15px">⚔️</div>
-<div class="combat-side enemy" id="combat-enemy">
-<div style="font-size:40px" id="enemy-icon">👹</div>
-<div class="hp-text">HP: <span id="enemy-hp">200</span></div>
-<div class="bar bar-hp"><div class="bar-fill" id="enemy-hp-bar" style="width:100%;background:linear-gradient(90deg,#ff3366,#ff6699)"></div></div>
-<div style="font-size:12px;color:#aaa;margin-top:4px" id="enemy-name">Враг</div>
-</div>
-</div>
-<div style="text-align:center;margin:10px 0">
-<button class="ability-btn ready" id="btn-attack" onclick="playerAttack()">⚔️ Атака</button>
-<button class="ability-btn ready" id="btn-ability" onclick="playerAbility()">✨ Способность</button>
-<button class="ability-btn ready" id="btn-defend" onclick="playerDefend()">🛡️ Защита</button>
-<button class="ability-btn ready" id="btn-flee" onclick="playerFlee()">🏃 Бежать</button>
-</div>
-<div class="resources" id="battle-resources">
-<span class="resource mana">💎 <span id="battle-mana">3</span>/<span id="battle-maxmana">5</span></span>
-<span class="resource gold">💰 <span id="battle-gold">0</span></span>
-</div>
-<div class="battle-log" id="battle-log"></div>
-<button class="btn btn-primary" id="btn-end-battle" style="display:none" onclick="endBattle()">Продолжить →</button>
-</div>
+                        <button class="btn-secondary" onclick="clearAllData()">🗑️ Очистить всё</button>
+                    </div>
+                </div>
 
-<!-- ЭКРАН РЕЙТИНГА -->
-<div id="screen-rating" class="screen">
-<h2>🏆 Рейтинг игроков</h2>
-<div id="rating-list"></div>
-<button class="btn btn-primary" onclick="showScreen('menu')">← Назад</button>
-</div>
+                <!-- Stats -->
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-card">
+                        <div class="label">Всего замков</div>
+                        <div class="value" id="totalCastles">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Разрушено</div>
+                        <div class="value" id="destroyedCastles">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Осталось</div>
+                        <div class="value" id="standingCastles">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Мощность</div>
+                        <div class="value" id="totalPower">0</div>
+                    </div>
+                </div>
+            </div>
 
-<!-- ЭКРАН ГАЙДА -->
-<div id="screen-guide" class="screen">
-<h2>📖 Как играть</h2>
-<div class="card">
-<h3>🎯 Цель</h3>
-<p>Разрушь замок противника, сохранив свой! Строй этажи, нанимай юнитов, прокачивай героев.</p>
-</div>
-<div class="card">
-<h3>🏰 Замок</h3>
-<p>До 4 этажей вверх, по 5 слотов на этаж. В слотах строй здания: казармы, шахты, кузницу, магбашню.</p>
-<p><b>Замок</b> — твои HP в битве. Чем выше замок, тем больше HP.</p>
-</div>
-<div class="card">
-<h3>👥 Герои</h3>
-<p><b>Summer</b> — копит энергию, через ход ×2 урон<br><b>Fantom</b> — стелс, поглощает атаку<br><b>Volt</b> — цепная молния по всем<br><b>Blade</b> — двойной удар<br><b>Titan Prime</b> — легендарный, платный</p>
-</div>
-<div class="card">
-<h3>🗺️ Карта</h3>
-<p>Проходи узлы по очереди. Каждый узел — битва с уникальным врагом. Награда растёт с прогрессом.</p>
-</div>
-<div class="card">
-<h3>🛒 Магазин</h3>
-<p>Покупай юнитов, улучшай замок и героев. Золото зарабатывается в битвах и от шахт.</p>
-</div>
-<button class="btn btn-primary" onclick="showScreen('menu')">← Назад</button>
-</div>
+            <!-- Right Panel: Results -->
+            <div>
+                <div class="card">
+                    <h2>📊 История замков</h2>
+                    <div class="results-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Замок</th>
+                                    <th>Статус</th>
+                                    <th>Дата</th>
+                                    <th>Действие</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTable">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 40px; color: #999;">
+                                        <div class="empty-state">
+                                            <div class="empty-state-icon">📭</div>
+                                            <p>Нет данных. Добавьте первый замок!</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-<!-- МОДАЛКА -->
-<div class="modal-overlay" id="modal-overlay">
-<div class="modal-content">
-<h3 id="modal-title"></h3>
-<p id="modal-text"></p>
-<button class="btn btn-primary" onclick="closeModal()">OK</button>
-</div>
-</div>
-
-<script>
-// ===== ИГРОВОЙ ДВИЖОК =====
-const Game = {
-  state: {
-    screen: 'menu',
-    player: {
-      gold: 500, mana: 50, gems: 20,
-      wins: 0, losses: 0, rating: 1000,
-      castle: { hp: 1000, maxHp: 1000, level: 1, floors: 1 },
-      buildings: { barracks: 1, mine: 1, forge: 0, tower: 0, mageTower: 0 },
-      units: [], hero: null, selectedHero: null,
-      upgrades: { attack: 0, defense: 0, speed: 0 }
-    },
-    enemy: {
-      gold: 500, mana: 50,
-      castle: { hp: 1000, maxHp: 1000, level: 1 },
-      buildings: { barracks: 1, mine: 1, forge: 0, tower: 0 },
-      units: [], hero: null,
-      upgrades: { attack: 0, defense: 0 }
-    },
-    map: {
-      nodes: [
-        { id: 0, name: 'Лагерь', type: 'camp', cleared: true, reward: { gold: 50 } },
-        { id: 1, name: 'Шахта', type: 'resource', cleared: false, reward: { gold: 100 } },
-        { id: 2, name: 'Деревня', type: 'village', cleared: false, reward: { gold: 80, mana: 20 } },
-        { id: 3, name: 'Башня мага', type: 'mage', cleared: false, reward: { mana: 40 } },
-        { id: 4, name: 'Кузница', type: 'forge', cleared: false, reward: { gems: 5 } },
-        { id: 5, name: 'Лес разбойников', type: 'bandits', cleared: false, reward: { gold: 150 } },
-        { id: 6, name: 'Руины', type: 'ruins', cleared: false, reward: { gold: 200, gems: 3 } },
-        { id: 7, name: 'Драконья пещера', type: 'boss', cleared: false, reward: { gold: 500, gems: 20 } },
-        { id: 8, name: 'Торговый пост', type: 'shop', cleared: true },
-        { id: 9, name: 'Арена', type: 'arena', cleared: false, reward: { rating: 50 } },
-        { id: 10, name: 'Святилище', type: 'shrine', cleared: false, reward: { mana: 60 } },
-        { id: 11, name: 'Вражеский замок', type: 'enemy_castle', cleared: false, reward: { gold: 1000 } }
-      ],
-      currentNode: 0
-    },
-    battle: null
-  },
-
-  heroes: {
-    summer: {
-      name: 'Summer', title: 'Энергетический воин',
-      hp: 120, attack: 25, defense: 10, speed: 8,
-      abilityName: 'Перезарядка', abilityDesc: 'Копит энергию. Через ход наносит ×2 урон',
-      cost: 0, color: '#ff6ec7', icon: '☀️',
-      abilityCooldown: 3, abilityCharges: 0
-    },
-    fantom: {
-      name: 'Fantom', title: 'Призрачный убийца',
-      hp: 90, attack: 30, defense: 5, speed: 12,
-      abilityName: 'Стелс', abilityDesc: 'Поглощает следующую атаку врага без урона',
-      cost: 200, color: '#9d4edd', icon: '👻',
-      abilityCooldown: 4, abilityCharges: 0
-    },
-    volt: {
-      name: 'Volt', title: 'Повелитель молний',
-      hp: 80, attack: 35, defense: 3, speed: 14,
-      abilityName: 'Цепная молния', abilityDesc: 'Бьёт по всем вражеским юнитам сразу',
-      cost: 350, color: '#48cae4', icon: '⚡',
-      abilityCooldown: 5, abilityCharges: 0
-    },
-    blade: {
-      name: 'Blade', title: 'Двойной клинок',
-      hp: 110, attack: 28, defense: 8, speed: 10,
-      abilityName: 'Двойной удар', abilityDesc: 'Атакует дважды за один ход',
-      cost: 500, color: '#ff4444', icon: '🗡️',
-      abilityCooldown: 3, abilityCharges: 0
-    },
-    titan_prime: {
-      name: 'Titan Prime', title: 'Легендарный титан',
-      hp: 200, attack: 45, defense: 20, speed: 6,
-      abilityName: 'Землетрясение', abilityDesc: 'Наносит урон замку и всем юнитам врага',
-      cost: 1000, color: '#ffd700', icon: '👑',
-      abilityCooldown: 6, abilityCharges: 0
-    }
-  },
-
-  unitTypes: {
-    knight:   { name: 'Рыцарь',   cost: 50,   hp: 60, attack: 15, defense: 8, speed: 5, icon: '🛡️' },
-    archer:   { name: 'Лучник',   cost: 40,   hp: 35, attack: 18, defense: 2, speed: 8, icon: '🏹' },
-    bomber:   { name: 'Бомбардировщик', cost: 80, hp: 45, attack: 30, defense: 3, speed: 4, icon: '💣' },
-    siege_engine:{ name:'Осадная машина', cost:120, hp:100,attack:40,defense:15,speed:3,icon:'⚔️' }
-  },
-
-  buildingTypes: {
-    barracks:{ name:'Казармы', cost:{gold:[100,200,400]}, desc:'Нанимает юнитов' },
-    mine:{ name:'Шахта', cost:{gold:[80,160,320]}, desc:'+20 золота/ход за уровень' },
-    forge:{ name:'Кузница', cost:{gold:[150,300]}, desc:'Улучшает атаку юнитов' },
-    tower:{ name:'Башня', cost:{gold:[120,240]}, desc:'Защита замка +50 HP' },
-    mageTower:{ name:'Магбашня', cost:{gold:[200]}, desc:'+10 маны/ход' }
-  },
-
-  // ===== НАВИГАЦИЯ =====
-  showScreen(name) {
-    this.state.screen = name;
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const el = document.getElementById('screen-' + name);
-    if (el) el.classList.add('active');
-    this.render();
-  },
-
-  // ===== РЕНДЕР ЭКРАНОВ =====
-  render() {
-    const s = this.state;
-    switch(s.screen) {
-      case 'menu': this.renderMenu(); break;
-      case 'heroes': this.renderHeroes(); break;
-      case 'shop': this.renderShop(); break;
-      case 'castle': this.renderCastle(); break;
-      case 'map': this.renderMap(); break;
-      case 'battle': this.renderBattle(); break;
-      case 'ranking': this.renderRanking(); break;
-      case 'guide': this.renderGuide(); break;
-    }
-  },
-
-  renderMenu() {
-    const p = this.state.player;
-    document.getElementById('menu-stats').innerHTML = `
-      <div class="stat-row">
-        <span class="stat-icon">💰</span><span>${p.gold}</span>
-        <span class="stat-icon">🔷</span><span>${p.mana}</span>
-        <span class="stat-icon">💎</span><span>${p.gems}</span>
-      </div>
-      <div class="stat-row">
-        <span>Победы:</span><b>${p.wins}</b>
-        <span>Поражения:</span><b>${p.losses}</b>
-        <span>Рейтинг:</span><b>${p.rating}</b>
-      </div>`;
-    document.getElementById('menu-hero').textContent = p.selectedHero ? this.heroes[p.selectedHero].name : 'Не выбран';
-    document.getElementById('menu-castle-hp').textContent = `${p.castle.hp}/${p.castle.maxHp} | Этаж ${p.castle.floors}/4`;
-  },
-
-  renderHeroes() {
-    const container = document.getElementById('heroes-list');
-    let html = '';
-    for (const [key, h] of Object.entries(this.heroes)) {
-      const owned = this.state.player.gold >= h.cost || key === 'summer';
-      const selected = this.state.player.selectedHero === key;
-      html += `
-        <div class="hero-card ${selected ? 'selected' : ''}" style="border-color:${h.color}">
-          <div class="hero-icon">${h.icon}</div>
-          <div class="hero-name" style="color:${h.color}">${h.name}</div>
-          <div class="hero-title">${h.title}</div>
-          <div class="hero-stats">
-            ❤️ ${h.hp} · ⚔️ ${h.attack} · 🛡️ ${h.defense} · 💨 ${h.speed}
-          </div>
-          <div class="hero-ability">
-            <b>${h.abilityName}</b>: ${h.abilityDesc}
-          </div>
-          ${selected 
-            ? '<button class="btn btn-selected" disabled>✓ Выбран</button>'
-            : `<button class="btn" onclick="Game.selectHero('${key}')" ${!owned && key!=='summer' ? `disabled>💎 ${h.cost}</button>` : '>Выбрать</button>'}`}
-        </div>`;
-    }
-    container.innerHTML = html;
-  },
-
-  selectHero(key) {
-    const h = this.heroes[key];
-    if (key !== 'summer' && this.state.player.gold < h.cost) return;
-    if (key !== 'summer') this.state.player.gold -= h.cost;
-    this.state.player.selectedHero = key;
-    this.renderHeroes();
-    this.renderMenu();
-  },
-
-  renderShop() {
-    const p = this.state.player;
-    let html = '';
-    for (const [key, u] of Object.entries(this.unitTypes)) {
-      const count = p.units.filter(u2 => u2.type === key).length;
-      html += `
-        <div class="shop-item">
-          <span class="shop-icon">${u.icon}</span>
-          <div class="shop-info">
-            <b>${u.name}</b> — ❤️${u.hp} ⚔️${u.attack} 🛡️${u.defense}
-            <br><small>В армии: ${count}</small>
-          </div>
-          <button class="btn" onclick="Game.buyUnit('${key}')" ${p.gold < u.cost ? 'disabled' : ''}>
-            💰 ${u.cost}
-          </button>
-        </div>`;
-    }
-    document.getElementById('shop-list').innerHTML = html;
-    document.getElementById('shop-gold').textContent = p.gold;
-  },
-
-  buyUnit(type) {
-    const u = this.unitTypes[type];
-    if (this.state.player.gold < u.cost) return;
-    this.state.player.gold -= u.cost;
-    this.state.player.units.push({ type, hp: u.hp, maxHp: u.hp });
-    this.renderShop();
-    this.renderMenu();
-  },
-
-  renderCastle() {
-    const p = this.state.player;
-    let html = `
-      <div class="castle-view">
-        <div class="castle-display">
-          <div class="castle-building" style="--floors:${p.castle.floors}">
-            ${Array.from({length:p.castle.floors},(_,i)=>`<div class="floor" style="bottom:${i*60}px"></div>`).join('')}
-            <div class="castle-base"></div>
-          </div>
-          <div class="castle-info">
-            <h3>Замок — Уровень ${p.castle.level}</h3>
-            <p>❤️ ${p.castle.hp}/${p.castle.maxHp}</p>
-            <p>Этажи: ${p.castle.floors}/4</p>
-          </div>
+                    <div class="control-panel" style="margin-top: 20px;">
+                        <button class="btn-secondary" onclick="exportData()">📥 Экспортировать</button>
+                        <button class="btn-secondary" onclick="importData()">📤 Импортировать</button>
+                        <input 
+                            type="file" 
+                            id="importFile" 
+                            accept=".json" 
+                            style="display: none;"
+                            onchange="handleFileImport(event)"
+                        >
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="buildings-grid">`;
-    
-    for (const [key,b] of Object.entries(this.buildingTypes)) {
-      const lvl = p.buildings[key] || 0;
-      const maxLvl = b.cost.gold.length;
-      const nextCost = lvl < maxLvl ? b.cost.gold[lvl] : null;
-      html += `
-        <div class="building-card">
-          <b>${b.name} (Ур.${lvl})</b>
-          <p>${b.desc}</p>
-          ${nextCost 
-            ? `<button class="btn" onclick="Game.build('${key}')" ${p.gold < nextCost ? 'disabled' : ''}>💰 ${nextCost}</button>`
-            : '<span class="max-lvl">Макс</span>'}
-        </div>`;
-    }
-    
-    // Улучшения замка
-    const upgradeCost = p.castle.level * 200;
-    html += `
-        </div>
-        <div class="castle-upgrades">
-          <h3>Улучшения замка</h3>
-          <button class="btn btn-upgrade" onclick="Game.upgradeCastle()" ${p.gold < upgradeCost || p.castle.floors >= 4 ? 'disabled' : ''}>
-            ${p.castle.floors >= 4 ? 'Максимальная высота' : `⬆️ Построить этаж (${upgradeCost}💰)`}
-          </button>
-          <button class="btn btn-repair" onclick="Game.repairCastle()" ${p.gold < 50 || p.castle.hp >= p.castle.maxHp ? 'disabled' : ''}>
-            🔧 Починить (+50 HP за ${50}💰)
-          </button>
-        </div>
-      </div>`;
-    document.getElementById('castle-content').innerHTML = html;
-    document.getElementById('castle-gold').textContent = p.gold;
-  },
 
-  upgradeCastle() {
-    const p = this.state.player;
-    if (p.castle.floors >= 4) return;
-    const cost = p.castle.level * 200;
-    if (p.gold < cost) return;
-    p.gold -= cost;
-    p.castle.floors++;
-    p.castle.maxHp += 200;
-    p.castle.hp += 200;
-    p.castle.level++;
-    this.renderCastle();
-    this.renderMenu();
-  },
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2024 Castle Busters | Создано с ❤️ используя HTML5, CSS3 и JavaScript</p>
+        </footer>
+    </div>
 
-  repairCastle() {
-    const p = this.state.player;
-    if (p.gold < 50 || p.castle.hp >= p.castle.maxHp) return;
-    p.gold -= 50;
-    p.castle.hp = Math.min(p.castle.maxHp, p.castle.hp + 50);
-    this.renderCastle();
-    this.renderMenu();
-  },
+    <script>
+        // Data Management
+        class CastleManager {
+            constructor() {
+                this.castles = this.loadFromStorage() || [];
+                this.updateUI();
+            }
 
-  build(key) {
-    const p = this.state.player;
-    const b = this.buildingTypes[key];
-    const lvl = p.buildings[key] || 0;
-    const cost = b.cost.gold[lvl];
-    if (!cost || p.gold < cost) return;
-    p.gold -= cost;
-    p.buildings[key]++;
-    if (key === 'tower') { p.castle.maxHp += 50; p.castle.hp += 50; }
-    this.renderCastle();
-    this.renderMenu();
-  },
+            addCastle(name, power) {
+                if (!name.trim()) {
+                    this.showAlert('Пожалуйста, введите название замка', 'warning');
+                    return false;
+                }
 
-  renderMap() {
-    const m = this.state.map;
-    let html = '<div class="map-grid">';
-    m.nodes.forEach((n,i) => {
-      const reachable = i === m.currentNode || i === m.currentNode + 1 || (n.type === 'shop' && n.cleared);
-      html += `
-        <div class="map-node ${n.cleared ? 'cleared' : ''} ${reachable ? 'reachable' : ''}" 
-             onclick="${reachable ? `Game.visitNode(${i})` : ''}">
-          <div class="node-icon">${this.nodeIcon(n.type)}</div>
-          <div class="node-name">${n.name}</div>
-          ${n.cleared ? '<small>✓ Зачищено</small>' : ''}
-        </div>`;
-    });
-    html += '</div>';
-    document.getElementById('map-content').innerHTML = html;
-  },
+                const castle = {
+                    id: Date.now(),
+                    name: name.trim(),
+                    power: Math.max(1, Math.min(100, parseInt(power) || 50)),
+                    status: 'standing',
+                    dateAdded: new Date().toLocaleString('ru-RU'),
+                    dateDestroyed: null
+                };
 
-  nodeIcon(type) {
-    return {'camp':'🏕️','resource':'⛏️','village':'🏘️','mage':'🔮','forge':'🔨',
-            'bandits':'🗡️','ruins':'🏚️','boss':'🐉','shop':'🛒','arena':'⚔️',
-            'shrine':'✨','enemy_castle':'🏰'}[type] || '?';
-},
+                this.castles.push(castle);
+                this.saveToStorage();
+                this.showAlert(`Замок "${castle.name}" добавлен!`, 'success');
+                return true;
+            }
 
-visitNode(idx) {
-    const n = this.state.map.nodes[idx];
-    if (n.cleared && n.type !== 'shop') return;
-    
-    switch(n.type) {
-      case 'camp':
-      case 'resource':
-      case 'village':
-      case 'mage':
-      case 'forge':
-      case 'shrine':
-        this.claimReward(n);
-        break;
-      case 'shop':
-        this.showScreen('shop');
-        return;
-      case 'bandits':
-      case 'ruins':
-      case arena:
-      case'boss':
-      case'enemy_castle':
-        this.startBattle(n);
-        return;
-    }
-},
+            destroyCastle(castleId) {
+                const castle = this.castles.find(c => c.id === castleId);
+                if (!castle) return false;
 
-claimReward(n) {
-if(n.reward) {
-if(n.reward.gold) this.state.player.gold += n.reward.gold;
-if(n.reward.mana) this.state.player.mana += n.reward.mana;
-if(n.reward.gems) this.state.player.gems += n.reward.gems;
-if(n.reward.rating) this.state.player.rating += n.reward.rating;
-}
-n.cleared = true;
-this.state.map.currentNode = n.id;
-this.renderMap();
-this.renderMenu();
-},
+                if (castle.status === 'destroyed') {
+                    this.showAlert('Этот замок уже разрушен', 'warning');
+                    return false;
+                }
 
-// ===== БОЕВАЯ СИСТЕМА =====
-startBattle(nodeData) {
-const p = this.state.player;
-if(!p.selectedHero) {
-alert('Выбери героя сначала!');
-this.showScreen('heroes');
-return;
-}
+                castle.status = 'destroyed';
+                castle.dateDestroyed = new Date().toLocaleString('ru-RU');
+                this.saveToStorage();
+                this.showAlert(`💥 Замок "${castle.name}" разрушен! Мощность: ${castle.power}`, 'success');
+                return true;
+            }
 
-const heroData = JSON.parse(JSON.stringify(this.heroes[p.selectedHero]));
-heroData.hp = heroData.hp; heroData.abilityCharges = heroData.abilityCooldown;
+            removeCastle(castleId) {
+                this.castles = this.castles.filter(c => c.id !== castleId);
+                this.saveToStorage();
+                this.showAlert('Замок удалён', 'info');
+            }
 
-// Генерация врага
-const enemyHeroKey = Object.keys(this.heroes)[Math.floor(Math.random()*Object.keys(this.heroes).length)];
-const enemyHero = JSON.parse(JSON.stringify(this.heroes[enemyHeroKey]));
-enemyHero.hp = enemyHero.hp;
+            getCastle(castleId) {
+                return this.castles.find(c => c.id === castleId);
+            }
 
-const enemyUnits = [];
-const unitKeys = Object.keys(this.unitTypes);
-for(let i=0;i<3+Math.floor(Math.random()*3);i++) {
-const uk = unitKeys[Math.floor(Math.random()*unitKeys.length)];
-const ud = this.unitTypes[uk];
-enemyUnits.push({type:'e_'+uk,hp:ud.hp,maxHp:ud.hp});
-}
+            getStats() {
+                const total = this.castles.length;
+                const destroyed = this.castles.filter(c => c.status === 'destroyed').length;
+                const standing = total - destroyed;
+                const totalPower = this.castles.reduce((sum, c) => sum + c.power, 0);
 
-this.state.battle = {
-turn:1,currentTurn:'player',
-log:[],
-playerHero:{...heroData},
-playerUnits:p.units.map(u=>({...u})),
-playerCastleHp:p.castle.hp,
-enemyHero:{...enemyHero},
-enemyUnits,
-enemyCastleHp:this.state.enemy.castle.hp,
-nodeData,
-roundCounter:{playerHeroAbilityCharge:-1}
-};
+                return { total, destroyed, standing, totalPower };
+            }
 
-this.showScreen('battle');
-},
+            saveToStorage() {
+                localStorage.setItem('castles', JSON.stringify(this.castles));
+            }
 
-renderBattle() {
-const b = this.state.battle;
-if(!b) return;
+            loadFromStorage() {
+                const data = localStorage.getItem('castles');
+                return data ? JSON.parse(data) : null;
+            }
 
-let playerUnitsHtml = b.playerUnits.map((u,i)=>{
-const ud = u.type.startsWith('e_')?this.unitTypes[u.type.slice(2)]:this.unitTypes[u.type];
-return `<div class="unit-card player-unit" onclick="Game.selectTarget('unit',${i})">
-${ud?ud.icon:'❓'} ❤️${u.hp}/${u.maxHp}
-</div>`;}).join('');
+            clearAll() {
+                this.castles = [];
+                this.saveToStorage();
+                this.showAlert('Все данные удалены', 'info');
+            }
 
-let enemyUnitsHtml = b.enemyUnits.map((u,i)=>{
-const ud=this.unitTypes[u.type.replace('e_','')];
-return `<div class="unit-card enemy-unit" onclick="Game.attackUnit(${i})">
-${ud?ud.icon:'❓'} ❤️${u.hp}/${u.maxHp}
-</div>`;}).join('');
+            showAlert(message, type = 'info') {
+                const alertsContainer = document.getElementById('alerts');
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type}`;
+                alertDiv.textContent = message;
 
-document.getElementById('battle-field').innerHTML = `
-<div class="battle-area">
-<div class="enemy-side">
-<div class="hero-bar enemy-hero-bar">
-<span style="color:${b.enemyHero.color}">${b.enemyHero.icon} ${b.enemyHero.name}</span>
-<span>❤️ ${b.enemyHero.hp}</span>
-</div>
-<div class="units-row">${enemyUnitsHtml || '<small>Нет юнитов</small>'}</div>
-<div class="castle-bar enemy-castle-bar">🏰 Вражеский замок ❤️${b.enemyCastleHp}</div>
-</div>
-<div class="battle-log" id="battle-log">${b.log.slice(-5).map(l=>`<p>${l}</p>`).join('')}</div>
-<div class="player-side">
-<div class="castle-bar player-castle-bar">🏰 Ваш замок ❤️${b.playerCastleHp}</div>
-<div class="units-row">${playerUnitsHtml || '<small>Нет юнитов</small>'}</div>
-<div class="hero-bar player-hero-bar">
-<span style="color:${b.playerHero.color}">${b.playerHero.icon} ${b.playerHero.name}</span>
-<span>❤️ ${b.playerHero.hp}</span>
-<button class="btn-sm" onclick="Game.useHeroAbility()">⚡ ${b.playerHero.abilityName}</button>
-</div>
-</div>
-</div>
-<div class="battle-controls">
-<button class="btn" onclick="Game.endTurn()">Конец хода ⏭️</button>
-<button class="btn btn-danger" onclick="Game.fleeBattle()">Отступить 🏃</button>
-</div>`;
+                alertsContainer.appendChild(alertDiv);
 
-// Прокрутка лога
-const logEl=document.getElementById('battle-log');
-if(logEl) logEl.scrollTop=logEl.scrollHeight;
-},
+                setTimeout(() => alertDiv.remove(), 4000);
+            }
 
-selectTarget(type,idx){ /* заглушка для выбора цели */ },
+            exportToJSON() {
+                const dataStr = JSON.stringify(this.castles, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `castles-${Date.now()}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                this.showAlert('Данные экспортированы', 'success');
+            }
 
-attackUnit(idx) {
-const b=this.state.battle;
-if(!b||b.currentTurn!=='player') return;
-if(b.playerUnits.length===0&&!b.playerHero) return;
+            importFromJSON(data) {
+                try {
+                    const imported = JSON.parse(data);
+                    if (Array.isArray(imported)) {
+                        this.castles = imported;
+                        this.saveToStorage();
+                        this.showAlert(`Импортировано ${imported.length} замков`, 'success');
+                        return true;
+                    }
+                } catch (e) {
+                    this.showAlert('Ошибка при импорте файла', 'error');
+                }
+                return false;
+            }
+        }
 
-// Атака героем первого юнита
-const dmg=Math.max(1,b.playerHero.attack-b.enemyUnits[idx].hp*0);
-b.enemyUnits[idx].hp-=dmg;
-this.addLog(`Ваш герой наносит ${dmg} урона по вражескому юниту!`);
+        // Initialize Manager
+        const manager = new CastleManager();
 
-if(b.enemyUnits[idx].hp<=0){
-b.enemyUnits.splice(idx,1);
-this.addLog('Вражеский юнит уничтожен!');
-}
+        // UI Functions
+        function addCastle() {
+            const nameInput = document.getElementById('castleNameInput');
+            const powerInput = document.getElementById('powerInput');
 
-this.checkWin();
-if(b.currentTurn==='enemy') return; // проверка победы может сменить экран
-this.aiTurn();
-},
+            if (manager.addCastle(nameInput.value, powerInput.value)) {
+                nameInput.value = '';
+                powerInput.value = '50';
+                updateUI();
+            }
+        }
 
-useHeroAbility() {
-const b=this.state.battle;
-if(!b||b.currentTurn!=='player') return;
-const h=b.playerHero;
+        function destroyCastle() {
+            const select = document.getElementById('castleSelect');
+            const castleId = parseInt(select.value);
 
-switch(h.name){
-case'Summer':
-h.abilityCharges=2; // следующий ход x2
-this.addLog('☀️ Summer заряжает энергию! Следующая атака ×2');
-break;
-case'Fantom':
-h.stealth=true;
-this.addLog('👻 Fantom входит в стелс! Поглотит следующую атаку');
-break;
-case'Volt':
-b.enemyUnits.forEach(u=>{u.hp-=20;});
-b.enemyUnits=b.enemyUnits.filter(u=>u.hp>0);
-this.addLog('⚡ Volt бьёт цепной молнией всех врагов!');
-break;
-case'Blade':
-h.doubleStrike=true;
-this.addLog('🗡️ Blade готовит двойной удар!');
-break;
-case'Titan Prime':
-b.enemyUnits.forEach(u=>{u.hp-=30;});
-b.enemyCastleHp-=50;
-b.enemyUnits=b.enemyUnits.filter(u=>u.hp>0);
-this.addLog('👑 Titan Prime вызывает землетрясение!');
-break;
-}
+            if (!castleId) {
+                manager.showAlert('Выберите замок для разрушения', 'warning');
+                return;
+            }
 
-this.checkWin();
-},
+            if (manager.destroyCastle(castleId)) {
+                updateUI();
+            }
+        }
 
-endTurn(){
-const b=this.state.battle;
-if(!b||b.currentTurn!=='player') return;
+        function clearAllData() {
+            if (confirm('⚠️ Вы уверены? Это удалит все данные!')) {
+                manager.clearAll();
+                updateUI();
+            }
+        }
 
-// Summer зарядка срабатывает при пропуске хода
-if(b.playerHero&&b.playerHero.abilityCharges===2){
-// ничего, срабатывает на след ходу
-}
+        function loadCastleData() {
+            const select = document.getElementById('castleSelect');
+            const castleId = parseInt(select.value);
 
-this.aiTurn();
-},
+            if (!castleId) {
+                document.getElementById('castleName').textContent = 'Добро пожаловать!';
+                document.getElementById('castleDescription').textContent = 'Выберите замок для просмотра';
+                return;
+            }
 
-aiTurn(){
-const b=this.state.battle;
-if(!b) return;
+            const castle = manager.getCastle(castleId);
+            if (castle) {
+                document.getElementById('castleName').textContent = castle.name;
+                const statusEmoji = castle.status === 'destroyed' ? '💔' : '🏰';
+                const statusText = castle.status === 'destroyed' ? 'Разрушен' : 'Стоит';
+                document.getElementById('castleDescription').textContent = 
+                    `${statusEmoji} ${statusText} | Мощность: ${castle.power} | Добавлен: ${castle.dateAdded}`;
+            }
+        }
 
-// Лимит лога
-if(b.log.length>30) b.log=b.log.slice(-20);
+        function exportData() {
+            manager.exportToJSON();
+        }
 
-// Враг атакует
-if(b.enemyUnits.length>0){
-// Каждый вражеский юнит атакует случайного игрока или замок
-for(const eu of b.enemyUnits){
-const targets=[];
-if(b.playerUnits.length>0){
-targets.push(()=>{const idx=Math.floor(Math.random()*b.playerUnits.length);const d=15;b.playerUnits[idx].hp-=d;this.addLog(`Враг бьёт вашего юнита на ${d}`);if(b.playerUnits[idx].hp<=0)b.playerUnits.splice(idx,1);});
-}
-targets.push(()=>{const d=10;b.playerCastleHp-=d;this.addLog(`Враг атакует ваш замок на ${d}`);});
-targets[Math.floor(Math.random()*targets.length)]();
-}
-}else if(b.enemyHero&&b.enemyHero.hp>0){
-// Герой врага атакует
-const dmg=Math.max(5,b.enemyHero.attack-Math.floor(Math.random()*8));
-if(b.playerUnits.length>0&&Math.random()>0.4){
-const idx=Math.floor(Math.random()*b.playerUnits.length);
-b.playerUnits[idx].hp-=dmg;
-this.addLog(`${b.enemyHero.name} бьёт вашего юнита на ${dmg}`);
-if(b.playerUnits[idx].hp<=0)b.playerUnits.splice(idx,1);
-}else{
-b.playerCastleHp-=dmg;
-this.addLog(`${b.enemyHero.name} атакует ваш замок на ${dmg}`);
-}
-}
+        function importData() {
+            document.getElementById('importFile').click();
+        }
 
-// Проверка поражения
-if(b.playerCastleHp<=0||(b.playerHero.hp<=0&&b.playerUnits.length===0)){
-this.loseBattle();
-return;
-}
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (manager.importFromJSON(e.target.result)) {
+                        updateUI();
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
 
-// Доход за ход
-this.collectIncome();
+        function updateUI() {
+            // Update Select
+            const select = document.getElementById('castleSelect');
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">-- Выберите замок --</option>';
 
-b.turn++;
-b.currentTurn='player';
-this.renderBattle();
-},
+            manager.castles.forEach(castle => {
+                const option = document.createElement('option');
+                option.value = castle.id;
+                option.textContent = `${castle.name} (${castle.status === 'destroyed' ? '💔' : '🏰'})`;
+                select.appendChild(option);
+            });
 
-collectIncome(){
-const p=this.state.player;
-let goldIncome=(p.buildings.mine||1)*20;
-let manaIncome=(p.buildings.mageTower||0)*10;
-p.gold+=goldIncome;p.mana+=manaIncome;
-},
+            select.value = currentValue;
 
-checkWin(){
-const b=this.state.battle;
-if(!b) return;
+            // Update Stats
+            const stats = manager.getStats();
+            document.getElementById('totalCastles').textContent = stats.total;
+            document.getElementById('destroyedCastles').textContent = stats.destroyed;
+            document.getElementById('standingCastles').textContent = stats.standing;
+            document.getElementById('totalPower').textContent = stats.totalPower;
 
-if(b.enemyUnits.length===0&&(!b.enemyHero||b.enemyHero.hp<=0)){
-this.winBattle();
-return;
-}
-},
+            // Update Table
+            updateTable();
+        }
 
-winBattle(){
-const b=this.state.battle;
-const r=b.nodeData?.reward||{gold:100};
-this.addLog('🏆 ПОБЕДА!');
-this.state.player.wins++;
-this.state.player.rating+=30;
+        function updateTable() {
+            const tbody = document.getElementById('resultsTable');
 
-if(r.gold)this.state.player.gold+=r.gold;
-if(r.mana)this.state.player.mana+=r.mana;
-if(r.gems)this.state.player.gems+=r.gems;
+            if (manager.castles.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 40px; color: #999;">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📭</div>
+                                <p>Нет данных. Добавьте первый замок!</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
 
-// Восстановление HP героя после боя
-this.heroes[this.state.player.selectedHero].hp=this.heroes[this.state.player.selectedHero].hp;
+            tbody.innerHTML = manager.castles.map(castle => `
+                <tr>
+                    <td><strong>${castle.name}</strong></td>
+                    <td>
+                        <span class="status-badge status-${castle.status}">
+                            ${castle.status === 'destroyed' ? '💥 Разрушен' : '🏰 Стоит'}
+                        </span>
+                    </td>
+                    <td>${castle.dateDestroyed || castle.dateAdded}</td>
+                    <td>
+                        <button 
+                            class="btn-danger" 
+                            onclick="manager.removeCastle(${castle.id}); updateUI();"
+                            style="padding: 6px 12px; font-size: 0.85rem;"
+                        >
+                            ✕
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
 
-// Отметить узел как зачищенный
-if(b.nodeData){
-b.nodeData.cleared=true;
-this.state.map.currentNode=b.nodeData.id;
-}
+        // Initialize on load
+        window.addEventListener('load', () => {
+            updateUI();
+            manager.showAlert('👋 Добро пожаловать в Castle Busters!', 'info');
+        });
 
-setTimeout(()=>{
-alert(`🏆 Победа!\n\nНаграда:\n💰 +${r.gold||0}\n🔷 +${r.mana||0}\n💎 +${r.gems||0}\nРейтинг +30`);
-this.state.battle=null;
-this.showScreen('map');
-},800);
-
-this.renderBattle();
-},
-
-loseBattle(){
-this.addLog('💀 Поражение...');
-this.state.player.losses++;
-this.state.player.rating=Math.max(0,this.state.player.rating-20);
-
-setTimeout(()=>{
-alert('💀 Поражение...\n\nРейтинг -20\nГерой восстанавливается через ход.');
-this.heroes[this.state.player.selectedHero].hp=this.heroes[this.state.player.selectedHero].hp+20; // лёгкое восстановление
-this.state.battle=null;
-this.showScreen('map');
-},800);
-},
-
-fleeBattle(){
-if(confirm('Отступить? Вы потеряете рейтинг.')){
-this.state.player.rating=Math.max(0,this.state.player.rating-10);
-this.state.battle=null;
-this.showScreen('map');
-}
-},
-
-addLog(msg){
-const b=this.state.battle;if(!b)return;b.log.push(msg);if(b.log.length>50)b.log.shift();
-},
-
-renderRanking(){
-document.getElementById('ranking-content').innerHTML=`
-<div class="ranking-list">
-<div class="rank-row you"><span class="rank-pos">#1</span><span class="rank-name">Настя (Вы)</span><span class="rank-score">${this.state.player.rating}</span></div>
-<div class="rank-row"><span class="rank-pos">#2</span><span class="rank-name">DarkLord99</span><span class="rank-score">${Math.max(800,this.state.player.rating-50)}</span></div>
-<div class="rank-row"><span class="rank-pos">#3</span><span class="rank-name">ShadowKing</span><span class="rank-score">${Math.max(750,this.state.player.rating-120)}</span></div>
-<div class="rank-row"><span class="rank-pos">#4</span><span class="rank-name">FrostQueen</span><span class="rank-score">${Math.max(700,this.state.player.rating-200)}</span></div>
-<div class="rank-row"><span class="rank-pos">#5</span><span class="rank-name">NeonWarrior</span><span class="rank-score">${Math.max(650,this.state.player.rating-280)}</span></div>
-</div>`;
-},
-
-renderGuide(){
-document.getElementById('guide-content').innerHTML=`
-<h3>Как играть в Castle Busters</h3>
-<div class="guide-section">
-<h4>🏰 Замок</h4>
-<p>Стройте этажи (до 4), улучшайте здания. Шахта даёт золото, магбашня — ману, кузница усиливает атаку.</p>
-</div>
-<div class="guide-section">
-<h4>⚔️ Герои</h4>
-<p><b>Summer</b> — копит энергию, через ход ×2 урон<br><b>Fantom</b> — стелс поглощает атаку<br><b>Volt</b> — цепная молния по всем<br><b>Blade</b> — двойной удар<br><b>Titan Prime</b> — легендарный титан</p>
-</div>
-<div class="guide-section">
-<h4>🗺️ Карта</h4>
-<p>Двигайтесь по узлам карты. Ресурсы дают золото и ману, лагеря разбойников — бой с наградой. Дойдите до вражеского замка!</p>
-</div>
-<div class="guide-section">
-<h4>🛒 Магазин</h4>
-<p>Покупайте юнитов за золото. Рыцарь — танк, лучник — дальний бой, бомбардировщик — урон по площади.</p>
-</div>`;
-},
-
-init(){ this.showScreen('menu'); }
-};
-
-window.addEventListener('DOMContentLoaded',()=>Game.init());
-</script>
+        // Keyboard shortcuts
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.target.id === 'castleNameInput') {
+                addCastle();
+            }
+        });
+    </script>
 </body>
 </html>
