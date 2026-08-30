@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Castle Busters - интерактивное веб-приложение для управления замками">
-    <meta name="theme-color" content="#2c3e50">
-    <title>Castle Busters | Интерактивное приложение</title>
+    <meta name="description" content="Castle Busters - киберпанк приложение для управления замками">
+    <meta name="theme-color" content="#0a0e27">
+    <title>Castle Busters | Киберпанк Стиль</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         * {
@@ -19,53 +19,114 @@
         }
 
         :root {
-            --primary: #ff6b6b;
-            --secondary: #4ecdc4;
-            --dark: #2c3e50;
-            --light: #ecf0f1;
-            --success: #51cf66;
-            --warning: #ffd93d;
-            --danger: #ff6b6b;
-            --transition: all 0.3s ease;
+            --neon-pink: #ff006e;
+            --neon-cyan: #00f5ff;
+            --neon-green: #39ff14;
+            --neon-purple: #b200ff;
+            --neon-orange: #ff6600;
+            --dark-bg: #0a0e27;
+            --dark-card: #1a1f3a;
+            --grid-color: rgba(0, 245, 255, 0.1);
+            --transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: var(--dark);
+            font-family: 'Roboto Mono', monospace;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a0033 100%);
+            background-attachment: fixed;
+            color: var(--neon-cyan);
             min-height: 100vh;
             padding: 20px;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(0deg, transparent 24%, var(--grid-color) 25%, var(--grid-color) 26%, transparent 27%, transparent 74%, var(--grid-color) 75%, var(--grid-color) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, var(--grid-color) 25%, var(--grid-color) 26%, transparent 27%, transparent 74%, var(--grid-color) 75%, var(--grid-color) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Neon Glow Effect */
+        .neon-glow {
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
         }
 
         /* Header */
         header {
             text-align: center;
-            color: white;
-            margin-bottom: 40px;
-            animation: slideDown 0.6s ease-out;
+            margin-bottom: 50px;
+            animation: slideDown 0.8s ease-out;
+            position: relative;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-pink), transparent);
+            box-shadow: 0 0 20px var(--neon-pink);
         }
 
         header h1 {
-            font-family: 'Press Start 2P', cursive;
-            font-size: 2.5rem;
+            font-family: 'Orbitron', monospace;
+            font-size: 3.5rem;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-pink), 0 0 30px var(--neon-purple);
+            letter-spacing: 4px;
             margin-bottom: 10px;
-            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.3);
-            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 900;
         }
 
         header p {
-            font-size: 1.1rem;
-            opacity: 0.95;
-            font-weight: 300;
+            font-size: 1.2rem;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
-        /* Main Content */
+        /* Main Grid */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -73,26 +134,43 @@
             margin-bottom: 40px;
         }
 
-        /* Card Styles */
+        /* Cards */
         .card {
-            background: white;
-            border-radius: 12px;
+            background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 31, 58, 0.8) 100%);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 0;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3), inset 0 0 20px rgba(0, 245, 255, 0.1);
             transition: var(--transition);
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1) 0%, transparent 100%);
+            pointer-events: none;
+            border-radius: 0;
         }
 
         .card:hover {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 30px rgba(255, 0, 110, 0.5), inset 0 0 20px rgba(255, 0, 110, 0.1);
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
         }
 
         .card h2 {
-            color: var(--primary);
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
             margin-bottom: 20px;
-            font-size: 1.5rem;
-            border-bottom: 3px solid var(--secondary);
-            padding-bottom: 10px;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: 'Orbitron', monospace;
         }
 
         /* Control Panel */
@@ -114,89 +192,120 @@
             flex: 1;
             min-width: 150px;
             padding: 12px 15px;
-            border: 2px solid var(--light);
-            border-radius: 8px;
+            background: rgba(10, 14, 39, 0.8);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 0;
             font-size: 1rem;
+            font-family: 'Roboto Mono', monospace;
+            color: var(--neon-cyan);
             transition: var(--transition);
-            font-family: 'Roboto', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"]::placeholder,
+        input[type="number"]::placeholder {
+            color: rgba(0, 245, 255, 0.5);
         }
 
         input[type="text"]:focus,
         input[type="number"]:focus,
         select:focus {
             outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px var(--neon-pink), inset 0 0 20px rgba(255, 0, 110, 0.1);
         }
 
         /* Buttons */
         button {
             padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
+            border: 2px solid;
+            border-radius: 0;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: var(--transition);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            font-family: 'Orbitron', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            transition: 0.3s;
+            z-index: -1;
+        }
+
+        button:hover::before {
+            left: 0;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #ff5252);
-            color: white;
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .btn-primary::before {
+            background: rgba(255, 0, 110, 0.2);
         }
 
         .btn-primary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
+            box-shadow: 0 0 20px var(--neon-pink), inset 0 0 10px rgba(255, 0, 110, 0.3);
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, var(--secondary), #45b7aa);
-            color: white;
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .btn-secondary::before {
+            background: rgba(0, 245, 255, 0.2);
         }
 
         .btn-secondary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.4);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #40c057;
+            box-shadow: 0 0 20px var(--neon-cyan), inset 0 0 10px rgba(0, 245, 255, 0.3);
         }
 
         .btn-danger {
-            background: var(--danger);
-            color: white;
+            border-color: var(--neon-orange);
+            color: var(--neon-orange);
+            text-shadow: 0 0 10px var(--neon-orange);
+            box-shadow: 0 0 10px var(--neon-orange);
+        }
+
+        .btn-danger::before {
+            background: rgba(255, 102, 0, 0.2);
         }
 
         .btn-danger:hover {
-            background: #ff5252;
+            box-shadow: 0 0 20px var(--neon-orange), inset 0 0 10px rgba(255, 102, 0, 0.3);
         }
 
         /* Castle Display */
         .castle-display {
-            background: linear-gradient(180deg, #87ceeb 0%, #e0f6ff 100%);
-            border-radius: 12px;
-            padding: 30px;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.05) 0%, rgba(178, 0, 255, 0.05) 100%);
+            border: 2px solid var(--neon-purple);
+            border-radius: 0;
+            padding: 40px;
             text-align: center;
-            min-height: 250px;
+            min-height: 280px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
-            overflow: hidden;
+            box-shadow: 0 0 30px rgba(178, 0, 255, 0.3), inset 0 0 30px rgba(178, 0, 255, 0.1);
         }
 
         .castle-display::before {
@@ -206,16 +315,22 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.3), transparent);
+            background: linear-gradient(45deg, transparent 30%, rgba(0, 245, 255, 0.05) 50%, transparent 70%);
             pointer-events: none;
         }
 
         .castle-emoji {
-            font-size: 80px;
-            animation: bounce 2s infinite;
+            font-size: 100px;
+            animation: pulse 2s ease-in-out infinite;
             margin-bottom: 20px;
             position: relative;
             z-index: 1;
+            filter: drop-shadow(0 0 10px var(--neon-purple));
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .castle-info {
@@ -224,18 +339,21 @@
         }
 
         .castle-info h3 {
-            font-size: 1.3rem;
-            color: var(--dark);
+            font-size: 1.5rem;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
             margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .castle-info p {
             font-size: 0.95rem;
-            color: #666;
-            line-height: 1.6;
+            color: var(--neon-cyan);
+            line-height: 1.8;
         }
 
-        /* Stats */
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -244,43 +362,57 @@
         }
 
         .stat-card {
-            background: linear-gradient(135deg, var(--secondary), #45b7aa);
-            color: white;
+            background: linear-gradient(135deg, rgba(57, 255, 20, 0.1) 0%, rgba(0, 245, 255, 0.1) 100%);
+            border: 2px solid var(--neon-green);
+            border-radius: 0;
             padding: 20px;
-            border-radius: 8px;
             text-align: center;
-            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .stat-card:hover {
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 25px rgba(178, 0, 255, 0.5);
+            transform: translateY(-3px);
         }
 
         .stat-card .label {
-            font-size: 0.85rem;
-            opacity: 0.9;
-            margin-bottom: 8px;
+            font-size: 0.8rem;
+            color: var(--neon-cyan);
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-bottom: 10px;
         }
 
         .stat-card .value {
-            font-size: 2rem;
-            font-weight: 700;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+            font-family: 'Orbitron', monospace;
         }
 
-        /* Results Table */
+        /* Table */
         .results-container {
-            max-height: 400px;
+            max-height: 450px;
             overflow-y: auto;
-            border: 2px solid var(--light);
-            border-radius: 8px;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 0;
+            background: rgba(10, 14, 39, 0.5);
+            box-shadow: inset 0 0 20px rgba(0, 245, 255, 0.1);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            font-family: 'Roboto Mono', monospace;
         }
 
         thead {
-            background: linear-gradient(135deg, var(--dark), #34495e);
-            color: white;
+            background: linear-gradient(90deg, rgba(178, 0, 255, 0.2) 0%, rgba(0, 245, 255, 0.2) 100%);
+            border-bottom: 2px solid var(--neon-pink);
             position: sticky;
             top: 0;
         }
@@ -290,13 +422,16 @@
             text-align: left;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             letter-spacing: 1px;
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
         }
 
         td {
             padding: 12px 15px;
-            border-bottom: 1px solid var(--light);
+            border-bottom: 1px solid rgba(0, 245, 255, 0.2);
+            color: var(--neon-cyan);
         }
 
         tbody tr {
@@ -304,64 +439,74 @@
         }
 
         tbody tr:hover {
-            background: rgba(78, 205, 196, 0.1);
+            background: rgba(0, 245, 255, 0.1);
+            border-left: 3px solid var(--neon-green);
         }
 
         .status-badge {
             display: inline-block;
             padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            border-radius: 0;
+            font-size: 0.8rem;
+            font-weight: 700;
             text-transform: uppercase;
+            border: 1px solid;
+            letter-spacing: 1px;
         }
 
         .status-destroyed {
-            background: var(--success);
-            color: white;
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            background: rgba(57, 255, 20, 0.1);
+            text-shadow: 0 0 5px var(--neon-green);
         }
 
         .status-standing {
-            background: var(--warning);
-            color: #333;
-        }
-
-        .status-new {
-            background: var(--secondary);
-            color: white;
+            border-color: var(--neon-orange);
+            color: var(--neon-orange);
+            background: rgba(255, 102, 0, 0.1);
+            text-shadow: 0 0 5px var(--neon-orange);
         }
 
         /* Alerts */
         .alert {
             padding: 15px 20px;
-            border-radius: 8px;
+            border-radius: 0;
             margin-bottom: 20px;
             border-left: 4px solid;
             animation: slideIn 0.4s ease-out;
+            font-family: 'Roboto Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
         }
 
         .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border-color: var(--success);
+            background: rgba(57, 255, 20, 0.1);
+            color: var(--neon-green);
+            border-color: var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green);
         }
 
         .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border-color: var(--secondary);
+            background: rgba(0, 245, 255, 0.1);
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            text-shadow: 0 0 5px var(--neon-cyan);
         }
 
         .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border-color: var(--warning);
+            background: rgba(255, 102, 0, 0.1);
+            color: var(--neon-orange);
+            border-color: var(--neon-orange);
+            text-shadow: 0 0 5px var(--neon-orange);
         }
 
         .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border-color: var(--danger);
+            background: rgba(255, 0, 110, 0.1);
+            color: var(--neon-pink);
+            border-color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink);
         }
 
         /* Animations */
@@ -387,44 +532,56 @@
             }
         }
 
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-        }
-
         /* Empty State */
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #999;
+            color: var(--neon-cyan);
         }
 
         .empty-state-icon {
             font-size: 48px;
             margin-bottom: 15px;
+            animation: pulse 2s ease-in-out infinite;
         }
 
         /* Footer */
         footer {
             text-align: center;
-            color: white;
+            color: var(--neon-cyan);
             margin-top: 60px;
             padding: 20px;
-            opacity: 0.9;
+            text-shadow: 0 0 10px var(--neon-cyan);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(0, 245, 255, 0.2);
+        }
+
+        footer a {
+            color: var(--neon-pink);
+            text-decoration: none;
+            text-shadow: 0 0 5px var(--neon-pink);
         }
 
         /* Responsive */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 2.5rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .main-grid {
                 grid-template-columns: 1fr;
             }
 
             header h1 {
-                font-size: 1.8rem;
+                font-size: 2rem;
             }
 
             .stats-grid {
@@ -440,25 +597,41 @@
             select {
                 min-width: 100%;
             }
+
+            button {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
         }
 
         /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
         }
 
         ::-webkit-scrollbar-track {
-            background: var(--light);
-            border-radius: 10px;
+            background: rgba(0, 245, 255, 0.1);
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--secondary);
-            border-radius: 10px;
+            background: var(--neon-cyan);
+            border-radius: 0;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
+            background: var(--neon-pink);
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        /* Glitch Effect */
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-cyan); }
+            50% { text-shadow: -2px 0 var(--neon-pink), 2px 0 var(--neon-cyan); }
+            100% { text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-cyan); }
+        }
+
+        .glitch {
+            animation: glitch 0.3s ease-in-out;
         }
     </style>
 </head>
@@ -466,8 +639,8 @@
     <div class="container">
         <!-- Header -->
         <header>
-            <h1>🏰 Castle Busters</h1>
-            <p>Интерактивное приложение для управления замками</p>
+            <h1>🏰 CASTLE BUSTERS</h1>
+            <p>▸ Киберпанк Управление Замками ◂</p>
         </header>
 
         <!-- Alerts Container -->
@@ -475,91 +648,91 @@
 
         <!-- Main Grid -->
         <div class="main-grid">
-            <!-- Left Panel: Control & Display -->
+            <!-- Left Panel -->
             <div>
                 <!-- Castle Display -->
                 <div class="card castle-display" id="castleDisplay">
                     <div class="castle-emoji">🏰</div>
                     <div class="castle-info">
-                        <h3 id="castleName">Добро пожаловать!</h3>
-                        <p id="castleDescription">Введите название замка и начните управление</p>
+                        <h3 id="castleName">⚡ СИСТЕМА АКТИВНА ⚡</h3>
+                        <p id="castleDescription">╔════════════════════════╗<br/>Введите название замка<br/>и начните управление<br/>╚════════════════════════╝</p>
                     </div>
                 </div>
 
                 <!-- Control Panel -->
                 <div class="card" style="margin-top: 20px;">
-                    <h2>⚙️ Управление</h2>
+                    <h2>⚙️ УПРАВЛЕНИЕ</h2>
                     <div class="control-panel">
                         <div class="input-group">
                             <input 
                                 type="text" 
                                 id="castleNameInput" 
-                                placeholder="Название замка (например: Hogwarts)"
+                                placeholder="Название замка"
                                 maxlength="50"
                             >
-                            <button class="btn-primary" onclick="addCastle()">+ Добавить</button>
+                            <button class="btn-primary" onclick="addCastle()">► ДОБАВИТЬ</button>
                         </div>
 
                         <div class="input-group">
                             <input 
                                 type="number" 
                                 id="powerInput" 
-                                placeholder="Сила разрушения (1-100)"
+                                placeholder="МОЩНОСТЬ (1-100)"
                                 min="1"
                                 max="100"
                                 value="50"
                             >
                             <select id="castleSelect" onchange="loadCastleData()">
-                                <option value="">-- Выберите замок --</option>
+                                <option value="">── ВЫБЕРИТЕ ЗАМОК ──</option>
                             </select>
-                            <button class="btn-danger" onclick="destroyCastle()" title="Разрушить выбранный замок">💥</button>
+                            <button class="btn-danger" onclick="destroyCastle()" title="РАЗРУШИТЬ">💥 DESTROY</button>
                         </div>
 
-                        <button class="btn-secondary" onclick="clearAllData()">🗑️ Очистить всё</button>
+                        <button class="btn-secondary" onclick="clearAllData()">🗑️ ОЧИСТИТЬ СИСТЕМУ</button>
                     </div>
                 </div>
 
                 <!-- Stats -->
                 <div class="stats-grid" style="margin-top: 20px;">
                     <div class="stat-card">
-                        <div class="label">Всего замков</div>
+                        <div class="label">▸ Всего ◂</div>
                         <div class="value" id="totalCastles">0</div>
                     </div>
                     <div class="stat-card">
-                        <div class="label">Разрушено</div>
+                        <div class="label">▸ Разрушено ◂</div>
                         <div class="value" id="destroyedCastles">0</div>
                     </div>
                     <div class="stat-card">
-                        <div class="label">Осталось</div>
+                        <div class="label">▸ Осталось ◂</div>
                         <div class="value" id="standingCastles">0</div>
                     </div>
                     <div class="stat-card">
-                        <div class="label">Мощность</div>
+                        <div class="label">▸ Мощность ◂</div>
                         <div class="value" id="totalPower">0</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Panel: Results -->
+            <!-- Right Panel -->
             <div>
                 <div class="card">
-                    <h2>📊 История замков</h2>
+                    <h2>📊 ИСТОРИЯ ОПЕРАЦИЙ</h2>
                     <div class="results-container">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Замок</th>
-                                    <th>Статус</th>
-                                    <th>Дата</th>
-                                    <th>Действие</th>
+                                    <th>[ЗАМОК]</th>
+                                    <th>[СТАТУС]</th>
+                                    <th>[ДАТА/ВРЕМЯ]</th>
+                                    <th>[ДЕЙСТВИЕ]</th>
                                 </tr>
                             </thead>
                             <tbody id="resultsTable">
                                 <tr>
-                                    <td colspan="4" style="text-align: center; padding: 40px; color: #999;">
+                                    <td colspan="4" style="text-align: center; padding: 40px; color: var(--neon-cyan);">
                                         <div class="empty-state">
                                             <div class="empty-state-icon">📭</div>
-                                            <p>Нет данных. Добавьте первый замок!</p>
+                                            <p>▸ СИСТЕМА ОЖИДАЕТ ДАННЫХ ◂</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -568,8 +741,8 @@
                     </div>
 
                     <div class="control-panel" style="margin-top: 20px;">
-                        <button class="btn-secondary" onclick="exportData()">📥 Экспортировать</button>
-                        <button class="btn-secondary" onclick="importData()">📤 Импортировать</button>
+                        <button class="btn-secondary" onclick="exportData()">📥 ЭКСПОРТ</button>
+                        <button class="btn-secondary" onclick="importData()">📤 ИМПОРТ</button>
                         <input 
                             type="file" 
                             id="importFile" 
@@ -584,7 +757,7 @@
 
         <!-- Footer -->
         <footer>
-            <p>&copy; 2024 Castle Busters | Создано с ❤️ используя HTML5, CSS3 и JavaScript</p>
+            <p>▸ CASTLE BUSTERS v2.0 ◂ КИБЕРПАНК EDITION ◂ 2024 ◂</p>
         </footer>
     </div>
 
@@ -593,12 +766,11 @@
         class CastleManager {
             constructor() {
                 this.castles = this.loadFromStorage() || [];
-                this.updateUI();
             }
 
             addCastle(name, power) {
                 if (!name.trim()) {
-                    this.showAlert('Пожалуйста, введите название замка', 'warning');
+                    this.showAlert('⚠️  ОШИБКА: Введите название замка!', 'warning');
                     return false;
                 }
 
@@ -613,7 +785,7 @@
 
                 this.castles.push(castle);
                 this.saveToStorage();
-                this.showAlert(`Замок "${castle.name}" добавлен!`, 'success');
+                this.showAlert(`✓ [${castle.name}] ДОБАВЛЕН В СИСТЕМУ | МОЩНОСТЬ: ${castle.power}`, 'success');
                 return true;
             }
 
@@ -622,21 +794,21 @@
                 if (!castle) return false;
 
                 if (castle.status === 'destroyed') {
-                    this.showAlert('Этот замок уже разрушен', 'warning');
+                    this.showAlert('⚠️  ЗАМОК УЖЕ РАЗРУШЕН', 'warning');
                     return false;
                 }
 
                 castle.status = 'destroyed';
                 castle.dateDestroyed = new Date().toLocaleString('ru-RU');
                 this.saveToStorage();
-                this.showAlert(`💥 Замок "${castle.name}" разрушен! Мощность: ${castle.power}`, 'success');
+                this.showAlert(`💥 [${castle.name}] РАЗРУШЕН! МОЩНОСТЬ УДАРА: ${castle.power}`, 'success');
                 return true;
             }
 
             removeCastle(castleId) {
                 this.castles = this.castles.filter(c => c.id !== castleId);
                 this.saveToStorage();
-                this.showAlert('Замок удалён', 'info');
+                this.showAlert('✓ ЗАПИСЬ УДАЛЕНА ИЗ СИСТЕМЫ', 'info');
             }
 
             getCastle(castleId) {
@@ -653,18 +825,18 @@
             }
 
             saveToStorage() {
-                localStorage.setItem('castles', JSON.stringify(this.castles));
+                localStorage.setItem('castles_cyberpunk', JSON.stringify(this.castles));
             }
 
             loadFromStorage() {
-                const data = localStorage.getItem('castles');
+                const data = localStorage.getItem('castles_cyberpunk');
                 return data ? JSON.parse(data) : null;
             }
 
             clearAll() {
                 this.castles = [];
                 this.saveToStorage();
-                this.showAlert('Все данные удалены', 'info');
+                this.showAlert('🗑️  СИСТЕМА ОЧИЩЕНА', 'info');
             }
 
             showAlert(message, type = 'info') {
@@ -675,7 +847,7 @@
 
                 alertsContainer.appendChild(alertDiv);
 
-                setTimeout(() => alertDiv.remove(), 4000);
+                setTimeout(() => alertDiv.remove(), 5000);
             }
 
             exportToJSON() {
@@ -684,10 +856,10 @@
                 const url = URL.createObjectURL(dataBlob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `castles-${Date.now()}.json`;
+                link.download = `castle-busters-${Date.now()}.json`;
                 link.click();
                 URL.revokeObjectURL(url);
-                this.showAlert('Данные экспортированы', 'success');
+                this.showAlert('✓ ДАННЫЕ ЭКСПОРТИРОВАНЫ', 'success');
             }
 
             importFromJSON(data) {
@@ -696,20 +868,18 @@
                     if (Array.isArray(imported)) {
                         this.castles = imported;
                         this.saveToStorage();
-                        this.showAlert(`Импортировано ${imported.length} замков`, 'success');
+                        this.showAlert(`✓ ИМПОРТИРОВАНО: ${imported.length} ЗАМКОВ`, 'success');
                         return true;
                     }
                 } catch (e) {
-                    this.showAlert('Ошибка при импорте файла', 'error');
+                    this.showAlert('⚠️  ОШИБКА ИМПОРТА', 'error');
                 }
                 return false;
             }
         }
 
-        // Initialize Manager
         const manager = new CastleManager();
 
-        // UI Functions
         function addCastle() {
             const nameInput = document.getElementById('castleNameInput');
             const powerInput = document.getElementById('powerInput');
@@ -726,7 +896,7 @@
             const castleId = parseInt(select.value);
 
             if (!castleId) {
-                manager.showAlert('Выберите замок для разрушения', 'warning');
+                manager.showAlert('⚠️  ВЫБЕРИТЕ ЦЕЛЬ', 'warning');
                 return;
             }
 
@@ -736,7 +906,7 @@
         }
 
         function clearAllData() {
-            if (confirm('⚠️ Вы уверены? Это удалит все данные!')) {
+            if (confirm('⚠️  ПОДТВЕРЖДЕНИЕ: ОЧИСТИТЬ ВСЕ ДАННЫЕ?')) {
                 manager.clearAll();
                 updateUI();
             }
@@ -747,18 +917,19 @@
             const castleId = parseInt(select.value);
 
             if (!castleId) {
-                document.getElementById('castleName').textContent = 'Добро пожаловать!';
-                document.getElementById('castleDescription').textContent = 'Выберите замок для просмотра';
+                document.getElementById('castleName').textContent = '⚡ СИСТЕМА АКТИВНА ⚡';
+                document.getElementById('castleDescription').textContent = 
+                    '╔════════════════════════╗\nВыберите замок для просмотра\n╚════════════════════════╝';
                 return;
             }
 
             const castle = manager.getCastle(castleId);
             if (castle) {
-                document.getElementById('castleName').textContent = castle.name;
+                document.getElementById('castleName').textContent = `>>> ${castle.name} <<<`;
                 const statusEmoji = castle.status === 'destroyed' ? '💔' : '🏰';
-                const statusText = castle.status === 'destroyed' ? 'Разрушен' : 'Стоит';
+                const statusText = castle.status === 'destroyed' ? 'РАЗРУШЕН' : 'АКТИВЕН';
                 document.getElementById('castleDescription').textContent = 
-                    `${statusEmoji} ${statusText} | Мощность: ${castle.power} | Добавлен: ${castle.dateAdded}`;
+                    `${statusEmoji} [${statusText}]\nМОЩНОСТЬ: ${castle.power}/100\nДОБАВЛЕН: ${castle.dateAdded}`;
             }
         }
 
@@ -784,28 +955,25 @@
         }
 
         function updateUI() {
-            // Update Select
             const select = document.getElementById('castleSelect');
             const currentValue = select.value;
-            select.innerHTML = '<option value="">-- Выберите замок --</option>';
+            select.innerHTML = '<option value="">── ВЫБЕРИТЕ ЗАМОК ──</option>';
 
             manager.castles.forEach(castle => {
                 const option = document.createElement('option');
                 option.value = castle.id;
-                option.textContent = `${castle.name} (${castle.status === 'destroyed' ? '💔' : '🏰'})`;
+                option.textContent = `[${castle.status === 'destroyed' ? '💔' : '🏰'}] ${castle.name}`;
                 select.appendChild(option);
             });
 
             select.value = currentValue;
 
-            // Update Stats
             const stats = manager.getStats();
             document.getElementById('totalCastles').textContent = stats.total;
             document.getElementById('destroyedCastles').textContent = stats.destroyed;
             document.getElementById('standingCastles').textContent = stats.standing;
             document.getElementById('totalPower').textContent = stats.totalPower;
 
-            // Update Table
             updateTable();
         }
 
@@ -815,10 +983,10 @@
             if (manager.castles.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="4" style="text-align: center; padding: 40px; color: #999;">
+                        <td colspan="4" style="text-align: center; padding: 40px;">
                             <div class="empty-state">
                                 <div class="empty-state-icon">📭</div>
-                                <p>Нет данных. Добавьте первый замок!</p>
+                                <p>▸ СИСТЕМА ОЖИДАЕТ ДАННЫХ ◂</p>
                             </div>
                         </td>
                     </tr>
@@ -828,10 +996,10 @@
 
             tbody.innerHTML = manager.castles.map(castle => `
                 <tr>
-                    <td><strong>${castle.name}</strong></td>
+                    <td><strong>[${castle.name}]</strong></td>
                     <td>
                         <span class="status-badge status-${castle.status}">
-                            ${castle.status === 'destroyed' ? '💥 Разрушен' : '🏰 Стоит'}
+                            ${castle.status === 'destroyed' ? '💥 DOWN' : '🟢 ACTIVE'}
                         </span>
                     </td>
                     <td>${castle.dateDestroyed || castle.dateAdded}</td>
@@ -839,22 +1007,20 @@
                         <button 
                             class="btn-danger" 
                             onclick="manager.removeCastle(${castle.id}); updateUI();"
-                            style="padding: 6px 12px; font-size: 0.85rem;"
+                            style="padding: 6px 12px; font-size: 0.8rem; margin: 0;"
                         >
-                            ✕
+                            ✕ DEL
                         </button>
                     </td>
                 </tr>
             `).join('');
         }
 
-        // Initialize on load
         window.addEventListener('load', () => {
             updateUI();
-            manager.showAlert('👋 Добро пожаловать в Castle Busters!', 'info');
+            manager.showAlert('✓ CASTLE BUSTERS v2.0 - КИБЕРПАНК EDITION ИНИЦИАЛИЗИРОВАНА', 'info');
         });
 
-        // Keyboard shortcuts
         document.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && e.target.id === 'castleNameInput') {
                 addCastle();
