@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Castle Busters - киберпанк приложение для управления замками">
-    <meta name="theme-color" content="#0a0e27">
-    <title>Castle Busters | Киберпанк Стиль</title>
+    <title>Castle Busters - PvP Battle</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,588 +23,408 @@
             --neon-purple: #b200ff;
             --neon-orange: #ff6600;
             --dark-bg: #0a0e27;
-            --dark-card: #1a1f3a;
-            --grid-color: rgba(0, 245, 255, 0.1);
-            --transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         body {
             font-family: 'Roboto Mono', monospace;
-            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a0033 100%);
-            background-attachment: fixed;
+            background: linear-gradient(135deg, #1a1a3e 0%, #2d0052 100%);
             color: var(--neon-cyan);
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        /* Animated background grid */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(0deg, transparent 24%, var(--grid-color) 25%, var(--grid-color) 26%, transparent 27%, transparent 74%, var(--grid-color) 75%, var(--grid-color) 76%, transparent 77%, transparent),
-                linear-gradient(90deg, transparent 24%, var(--grid-color) 25%, var(--grid-color) 26%, transparent 27%, transparent 74%, var(--grid-color) 75%, var(--grid-color) 76%, transparent 77%, transparent);
-            background-size: 50px 50px;
-            animation: gridMove 20s linear infinite;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        @keyframes gridMove {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(50px); }
+            overflow: hidden;
+            user-select: none;
         }
 
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Neon Glow Effect */
-        .neon-glow {
-            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Header */
         header {
-            text-align: center;
-            margin-bottom: 50px;
-            animation: slideDown 0.8s ease-out;
-            position: relative;
+            background: linear-gradient(90deg, rgba(0, 245, 255, 0.1) 0%, rgba(255, 0, 110, 0.1) 100%);
+            border-bottom: 3px solid var(--neon-cyan);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
         }
 
-        header::before {
-            content: '';
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-            box-shadow: 0 0 20px var(--neon-cyan);
-        }
-
-        header::after {
-            content: '';
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-pink), transparent);
-            box-shadow: 0 0 20px var(--neon-pink);
-        }
-
-        header h1 {
-            font-family: 'Orbitron', monospace;
-            font-size: 3.5rem;
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-pink), 0 0 30px var(--neon-purple);
-            letter-spacing: 4px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            font-weight: 900;
-        }
-
-        header p {
-            font-size: 1.2rem;
+        .header-left, .header-center, .header-right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 20px;
             color: var(--neon-green);
-            text-shadow: 0 0 10px var(--neon-green);
-            letter-spacing: 2px;
-            text-transform: uppercase;
         }
 
-        /* Main Grid */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
+        .header-center {
+            justify-content: center;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            text-shadow: 0 0 15px var(--neon-pink);
+            color: var(--neon-pink);
         }
 
-        /* Cards */
-        .card {
-            background: linear-gradient(135deg, var(--dark-card) 0%, rgba(26, 31, 58, 0.8) 100%);
-            border: 2px solid var(--neon-cyan);
-            border-radius: 0;
-            padding: 30px;
-            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3), inset 0 0 20px rgba(0, 245, 255, 0.1);
-            transition: var(--transition);
+        .header-right {
+            justify-content: flex-end;
+        }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .stat {
+            background: rgba(0, 245, 255, 0.1);
+            padding: 5px 10px;
+            border: 1px solid var(--neon-cyan);
+            border-radius: 3px;
+        }
+
+        /* Battle Arena */
+        .battle-area {
+            flex: 1;
+            display: flex;
             position: relative;
+            background: linear-gradient(180deg, #4a6fa5 0%, #2d4a7c 50%, #1a3a5c 100%);
+            overflow: hidden;
         }
 
-        .card::before {
-            content: '';
+        /* Background */
+        .battle-background {
             position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(0, 245, 255, 0.1) 0%, transparent 100%);
-            pointer-events: none;
-            border-radius: 0;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            opacity: 0.3;
         }
 
-        .card:hover {
-            border-color: var(--neon-pink);
-            box-shadow: 0 0 30px rgba(255, 0, 110, 0.5), inset 0 0 20px rgba(255, 0, 110, 0.1);
-            transform: translateY(-5px);
+        .mountain {
+            position: absolute;
+            bottom: 0;
+            opacity: 0.4;
         }
 
-        .card h2 {
-            color: var(--neon-pink);
-            text-shadow: 0 0 10px var(--neon-pink);
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-            letter-spacing: 2px;
+        .mountain-left {
+            left: 10%;
+            width: 300px;
+            height: 300px;
+            border-radius: 100% 0 0 0;
+            background: linear-gradient(135deg, #8b7355 0%, #654321 100%);
+        }
+
+        .mountain-right {
+            right: 10%;
+            width: 300px;
+            height: 300px;
+            border-radius: 0 100% 0 0;
+            background: linear-gradient(225deg, #8b7355 0%, #654321 100%);
+        }
+
+        /* Game Content */
+        .game-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 0 50px 100px;
+        }
+
+        /* Castle */
+        .castle-wrapper {
+            position: relative;
+            height: 300px;
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .castle {
+            position: relative;
+            width: 200px;
+            height: 240px;
+            background: linear-gradient(135deg, #4a2c2a 0%, #2a1a1a 100%);
+            border: 3px solid #8b6f47;
+            border-radius: 5px 5px 30px 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        /* Castle Floors */
+        .castle-floor {
+            position: absolute;
+            width: 100%;
+            height: 40%;
+            border-bottom: 2px solid #8b6f47;
+            background: linear-gradient(90deg, rgba(100, 80, 60, 0.5) 0%, rgba(80, 60, 40, 0.5) 50%, rgba(100, 80, 60, 0.5) 100%);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 5px;
+        }
+
+        .floor-1 { top: 0; }
+        .floor-2 { top: 40%; }
+        .floor-3 { top: 80%; }
+
+        .castle-block {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #8b6f47 0%, #5a4a2a 100%);
+            border: 1px solid #6b5a3a;
+            opacity: 1;
+            transition: all 0.3s;
+        }
+
+        .castle-block.destroyed {
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .castle-tower {
+            position: absolute;
+            width: 30px;
+            height: 80px;
+            background: linear-gradient(135deg, #1a0f0a 0%, #0a0505 100%);
+            border: 2px solid #8b6f47;
+            top: -50px;
+        }
+
+        .tower-left {
+            left: 10px;
+        }
+
+        .tower-right {
+            right: 10px;
+        }
+
+        .tower-flag {
+            position: absolute;
+            width: 20px;
+            height: 15px;
+            background: var(--neon-pink);
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        /* Castle Legs */
+        .castle-legs {
+            position: absolute;
+            bottom: -50px;
+            width: 100%;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .leg {
+            width: 15px;
+            height: 50px;
+            background: linear-gradient(90deg, #4a2c2a 0%, #2a1a1a 100%);
+            border: 2px solid #8b6f47;
+            border-radius: 0 0 10px 10px;
+            animation: walkLeft 1s infinite;
+            transform-origin: top center;
+        }
+
+        .leg-right {
+            animation: walkRight 1s infinite;
+        }
+
+        @keyframes walkLeft {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(-15deg); }
+        }
+
+        @keyframes walkRight {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(15deg); }
+        }
+
+        /* Health Bar */
+        .health-bar-wrapper {
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .health-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--neon-green);
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-green) 0%, var(--neon-cyan) 100%);
+            width: 100%;
+            transition: width 0.3s;
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .health-text {
+            font-size: 0.8rem;
+            text-align: center;
+            color: var(--neon-green);
+        }
+
+        /* Units Display */
+        .units-display {
+            position: absolute;
+            bottom: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .unit-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 245, 255, 0.1);
+            border: 2px solid var(--neon-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border-radius: 3px;
+            animation: unitPulse 1s infinite;
+        }
+
+        @keyframes unitPulse {
+            0%, 100% { box-shadow: 0 0 10px var(--neon-cyan); }
+            50% { box-shadow: 0 0 20px var(--neon-cyan); }
+        }
+
+        /* Battle Log */
+        .battle-log {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 300px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--neon-green);
+            padding: 15px;
+            overflow-y: auto;
+            z-index: 5;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+        }
+
+        .log-title {
+            color: var(--neon-green);
+            font-weight: bold;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+        }
+
+        .log-entry {
+            color: var(--neon-cyan);
+            font-size: 0.75rem;
+            margin-bottom: 5px;
+            border-bottom: 1px solid rgba(0, 245, 255, 0.2);
+            padding-bottom: 3px;
         }
 
         /* Control Panel */
         .control-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-        }
-
-        .input-group {
-            display: flex;
             gap: 10px;
-            flex-wrap: wrap;
+            z-index: 5;
         }
 
-        input[type="text"],
-        input[type="number"],
-        select {
-            flex: 1;
-            min-width: 150px;
-            padding: 12px 15px;
-            background: rgba(10, 14, 39, 0.8);
+        .control-btn {
+            padding: 10px 20px;
+            background: rgba(0, 245, 255, 0.1);
             border: 2px solid var(--neon-cyan);
-            border-radius: 0;
-            font-size: 1rem;
-            font-family: 'Roboto Mono', monospace;
             color: var(--neon-cyan);
-            transition: var(--transition);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        input[type="text"]::placeholder,
-        input[type="number"]::placeholder {
-            color: rgba(0, 245, 255, 0.5);
-        }
-
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--neon-pink);
-            box-shadow: 0 0 20px var(--neon-pink), inset 0 0 20px rgba(255, 0, 110, 0.1);
-        }
-
-        /* Buttons */
-        button {
-            padding: 12px 24px;
-            border: 2px solid;
-            border-radius: 0;
-            font-size: 1rem;
-            font-weight: 700;
             cursor: pointer;
-            transition: var(--transition);
-            text-transform: uppercase;
-            letter-spacing: 2px;
             font-family: 'Orbitron', monospace;
-            position: relative;
-            overflow: hidden;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            font-weight: bold;
         }
 
-        button::before {
-            content: '';
+        .control-btn:hover {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Damage Numbers */
+        .damage-number {
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            transition: 0.3s;
-            z-index: -1;
-        }
-
-        button:hover::before {
-            left: 0;
-        }
-
-        .btn-primary {
-            border-color: var(--neon-pink);
-            color: var(--neon-pink);
-            text-shadow: 0 0 10px var(--neon-pink);
-            box-shadow: 0 0 10px var(--neon-pink);
-        }
-
-        .btn-primary::before {
-            background: rgba(255, 0, 110, 0.2);
-        }
-
-        .btn-primary:hover {
-            box-shadow: 0 0 20px var(--neon-pink), inset 0 0 10px rgba(255, 0, 110, 0.3);
-        }
-
-        .btn-secondary {
-            border-color: var(--neon-cyan);
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px var(--neon-cyan);
-            box-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        .btn-secondary::before {
-            background: rgba(0, 245, 255, 0.2);
-        }
-
-        .btn-secondary:hover {
-            box-shadow: 0 0 20px var(--neon-cyan), inset 0 0 10px rgba(0, 245, 255, 0.3);
-        }
-
-        .btn-danger {
-            border-color: var(--neon-orange);
-            color: var(--neon-orange);
-            text-shadow: 0 0 10px var(--neon-orange);
-            box-shadow: 0 0 10px var(--neon-orange);
-        }
-
-        .btn-danger::before {
-            background: rgba(255, 102, 0, 0.2);
-        }
-
-        .btn-danger:hover {
-            box-shadow: 0 0 20px var(--neon-orange), inset 0 0 10px rgba(255, 102, 0, 0.3);
-        }
-
-        /* Castle Display */
-        .castle-display {
-            background: linear-gradient(135deg, rgba(0, 245, 255, 0.05) 0%, rgba(178, 0, 255, 0.05) 100%);
-            border: 2px solid var(--neon-purple);
-            border-radius: 0;
-            padding: 40px;
-            text-align: center;
-            min-height: 280px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            box-shadow: 0 0 30px rgba(178, 0, 255, 0.3), inset 0 0 30px rgba(178, 0, 255, 0.1);
-        }
-
-        .castle-display::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent 30%, rgba(0, 245, 255, 0.05) 50%, transparent 70%);
+            font-weight: bold;
+            font-size: 2rem;
             pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            text-shadow: 0 0 10px currentColor;
         }
 
-        .castle-emoji {
-            font-size: 100px;
-            animation: pulse 2s ease-in-out infinite;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-            filter: drop-shadow(0 0 10px var(--neon-purple));
+        .damage-red {
+            color: #ff3333;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .castle-info {
-            position: relative;
-            z-index: 1;
-        }
-
-        .castle-info h3 {
-            font-size: 1.5rem;
+        .damage-green {
             color: var(--neon-green);
-            text-shadow: 0 0 10px var(--neon-green);
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
-        .castle-info p {
-            font-size: 0.95rem;
-            color: var(--neon-cyan);
-            line-height: 1.8;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, rgba(57, 255, 20, 0.1) 0%, rgba(0, 245, 255, 0.1) 100%);
-            border: 2px solid var(--neon-green);
-            border-radius: 0;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 0 15px rgba(57, 255, 20, 0.3);
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .stat-card:hover {
-            border-color: var(--neon-purple);
-            box-shadow: 0 0 25px rgba(178, 0, 255, 0.5);
-            transform: translateY(-3px);
-        }
-
-        .stat-card .label {
-            font-size: 0.8rem;
-            color: var(--neon-cyan);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }
-
-        .stat-card .value {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--neon-green);
-            text-shadow: 0 0 10px var(--neon-green);
-            font-family: 'Orbitron', monospace;
-        }
-
-        /* Table */
-        .results-container {
-            max-height: 450px;
-            overflow-y: auto;
-            border: 2px solid var(--neon-cyan);
-            border-radius: 0;
-            background: rgba(10, 14, 39, 0.5);
-            box-shadow: inset 0 0 20px rgba(0, 245, 255, 0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: 'Roboto Mono', monospace;
-        }
-
-        thead {
-            background: linear-gradient(90deg, rgba(178, 0, 255, 0.2) 0%, rgba(0, 245, 255, 0.2) 100%);
-            border-bottom: 2px solid var(--neon-pink);
-            position: sticky;
-            top: 0;
-        }
-
-        th {
-            padding: 15px;
-            text-align: left;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            color: var(--neon-pink);
-            text-shadow: 0 0 10px var(--neon-pink);
-        }
-
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid rgba(0, 245, 255, 0.2);
-            color: var(--neon-cyan);
-        }
-
-        tbody tr {
-            transition: var(--transition);
-        }
-
-        tbody tr:hover {
-            background: rgba(0, 245, 255, 0.1);
-            border-left: 3px solid var(--neon-green);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 0;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            border: 1px solid;
-            letter-spacing: 1px;
-        }
-
-        .status-destroyed {
-            border-color: var(--neon-green);
-            color: var(--neon-green);
-            background: rgba(57, 255, 20, 0.1);
-            text-shadow: 0 0 5px var(--neon-green);
-        }
-
-        .status-standing {
-            border-color: var(--neon-orange);
-            color: var(--neon-orange);
-            background: rgba(255, 102, 0, 0.1);
-            text-shadow: 0 0 5px var(--neon-orange);
-        }
-
-        /* Alerts */
-        .alert {
-            padding: 15px 20px;
-            border-radius: 0;
-            margin-bottom: 20px;
-            border-left: 4px solid;
-            animation: slideIn 0.4s ease-out;
-            font-family: 'Roboto Mono', monospace;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
-        }
-
-        .alert-success {
-            background: rgba(57, 255, 20, 0.1);
-            color: var(--neon-green);
-            border-color: var(--neon-green);
-            text-shadow: 0 0 5px var(--neon-green);
-        }
-
-        .alert-info {
-            background: rgba(0, 245, 255, 0.1);
-            color: var(--neon-cyan);
-            border-color: var(--neon-cyan);
-            text-shadow: 0 0 5px var(--neon-cyan);
-        }
-
-        .alert-warning {
-            background: rgba(255, 102, 0, 0.1);
-            color: var(--neon-orange);
-            border-color: var(--neon-orange);
-            text-shadow: 0 0 5px var(--neon-orange);
-        }
-
-        .alert-error {
-            background: rgba(255, 0, 110, 0.1);
-            color: var(--neon-pink);
-            border-color: var(--neon-pink);
-            text-shadow: 0 0 5px var(--neon-pink);
-        }
-
-        /* Animations */
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
+        @keyframes floatUp {
+            0% {
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-
-        @keyframes slideIn {
-            from {
+            100% {
                 opacity: 0;
-                transform: translateX(-30px);
+                transform: translateY(-60px);
             }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--neon-cyan);
-        }
-
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-            animation: pulse 2s ease-in-out infinite;
         }
 
         /* Footer */
         footer {
+            background: linear-gradient(90deg, rgba(178, 0, 255, 0.1) 0%, rgba(0, 245, 255, 0.1) 100%);
+            border-top: 2px solid var(--neon-purple);
+            padding: 10px 30px;
             text-align: center;
-            color: var(--neon-cyan);
-            margin-top: 60px;
-            padding: 20px;
-            text-shadow: 0 0 10px var(--neon-cyan);
-            letter-spacing: 2px;
+            color: var(--neon-purple);
+            font-size: 0.8rem;
             text-transform: uppercase;
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(0, 245, 255, 0.2);
-        }
-
-        footer a {
-            color: var(--neon-pink);
-            text-decoration: none;
-            text-shadow: 0 0 5px var(--neon-pink);
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-
-            header h1 {
-                font-size: 2.5rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-
-            header h1 {
-                font-size: 2rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .input-group {
-                flex-direction: column;
-            }
-
-            input[type="text"],
-            input[type="number"],
-            select {
-                min-width: 100%;
-            }
-
-            button {
-                padding: 10px 16px;
-                font-size: 0.9rem;
-            }
+            letter-spacing: 1px;
         }
 
         /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 10px;
+            width: 6px;
         }
 
         ::-webkit-scrollbar-track {
@@ -615,23 +433,26 @@
 
         ::-webkit-scrollbar-thumb {
             background: var(--neon-cyan);
-            border-radius: 0;
         }
 
         ::-webkit-scrollbar-thumb:hover {
             background: var(--neon-pink);
-            box-shadow: 0 0 10px var(--neon-pink);
         }
 
-        /* Glitch Effect */
-        @keyframes glitch {
-            0% { text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-cyan); }
-            50% { text-shadow: -2px 0 var(--neon-pink), 2px 0 var(--neon-cyan); }
-            100% { text-shadow: 2px 0 var(--neon-pink), -2px 0 var(--neon-cyan); }
-        }
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .battle-area {
+                flex-direction: column;
+            }
 
-        .glitch {
-            animation: glitch 0.3s ease-in-out;
+            .game-content {
+                flex-direction: column;
+                gap: 50px;
+            }
+
+            .castle-wrapper {
+                margin: 50px auto;
+            }
         }
     </style>
 </head>
@@ -639,393 +460,410 @@
     <div class="container">
         <!-- Header -->
         <header>
-            <h1>🏰 CASTLE BUSTERS</h1>
-            <p>▸ Киберпанк Управление Замками ◂</p>
+            <div class="header-left">
+                <div class="player-header">
+                    <span>🟢 GRINCHITA</span>
+                    <div class="stat">💰 <span id="playerGold">1000</span></div>
+                    <div class="stat">⚡ <span id="playerPower">100</span>%</div>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                ROUND <span id="roundNumber">1</span> | <span id="roundTimer">60</span>s
+            </div>
+            
+            <div class="header-right">
+                <div class="player-header">
+                    <div class="stat">💰 <span id="enemyGold">1000</span></div>
+                    <div class="stat">⚡ <span id="enemyPower">100</span>%</div>
+                    <span>🤖 ENEMY</span>
+                </div>
+            </div>
         </header>
 
-        <!-- Alerts Container -->
-        <div id="alerts"></div>
+        <!-- Battle Area -->
+        <div class="battle-area">
+            <!-- Background -->
+            <div class="battle-background">
+                <div class="mountain mountain-left"></div>
+                <div class="mountain mountain-right"></div>
+            </div>
 
-        <!-- Main Grid -->
-        <div class="main-grid">
-            <!-- Left Panel -->
-            <div>
-                <!-- Castle Display -->
-                <div class="card castle-display" id="castleDisplay">
-                    <div class="castle-emoji">🏰</div>
-                    <div class="castle-info">
-                        <h3 id="castleName">⚡ СИСТЕМА АКТИВНА ⚡</h3>
-                        <p id="castleDescription">╔════════════════════════╗<br/>Введите название замка<br/>и начните управление<br/>╚════════════════════════╝</p>
+            <!-- Game Content -->
+            <div class="game-content">
+                <!-- Player Castle -->
+                <div class="castle-wrapper" id="playerCastleWrapper">
+                    <div class="castle" id="playerCastle">
+                        <div class="castle-tower tower-left">
+                            <div class="tower-flag"></div>
+                        </div>
+                        <div class="castle-tower tower-right">
+                            <div class="tower-flag"></div>
+                        </div>
+                        
+                        <div class="castle-floor floor-1">
+                            <div class="castle-block"></div>
+                            <div class="castle-block"></div>
+                            <div class="castle-block"></div>
+                        </div>
+                        <div class="castle-floor floor-2">
+                            <div class="castle-block"></div>
+                            <div class="castle-block"></div>
+                            <div class="castle-block"></div>
+                        </div>
+                        <div class="castle-floor floor-3">
+                            <div class="castle-block"></div>
+                            <div class="castle-block"></div>
+                            <div class="castle-block"></div>
+                        </div>
+
+                        <div class="castle-legs">
+                            <div class="leg"></div>
+                            <div class="leg leg-right"></div>
+                            <div class="leg"></div>
+                        </div>
+                    </div>
+
+                    <div class="health-bar-wrapper">
+                        <div class="health-bar">
+                            <div class="health-fill" id="playerHealthBar" style="width: 100%"></div>
+                        </div>
+                        <div class="health-text">
+                            <span id="playerHP">1000</span> / <span id="playerMaxHP">1000</span>
+                        </div>
+                    </div>
+
+                    <div class="units-display">
+                        <div class="unit-icon" title="Grinchita - Absorb">🟢</div>
+                        <div class="unit-icon" title="Summer - Fire">☀️</div>
+                        <div class="unit-icon" title="Fantom - Stealth">👻</div>
                     </div>
                 </div>
 
-                <!-- Control Panel -->
-                <div class="card" style="margin-top: 20px;">
-                    <h2>⚙️ УПРАВЛЕНИЕ</h2>
-                    <div class="control-panel">
-                        <div class="input-group">
-                            <input 
-                                type="text" 
-                                id="castleNameInput" 
-                                placeholder="Название замка"
-                                maxlength="50"
-                            >
-                            <button class="btn-primary" onclick="addCastle()">► ДОБАВИТЬ</button>
+                <!-- Enemy Castle -->
+                <div class="castle-wrapper" id="enemyCastleWrapper">
+                    <div class="castle" id="enemyCastle">
+                        <div class="castle-tower tower-left">
+                            <div class="tower-flag" style="background: var(--neon-orange);"></div>
+                        </div>
+                        <div class="castle-tower tower-right">
+                            <div class="tower-flag" style="background: var(--neon-orange);"></div>
+                        </div>
+                        
+                        <div class="castle-floor floor-1">
+                            <div class="castle-block"></div>
+                            <div class="castle-block"></div>
+                            <div class="castle-block"></div>
+                        </div>
+                        <div class="castle-floor floor-2">
+                            <div class="castle-block"></div>
+                            <div class="castle-block"></div>
+                            <div class="castle-block"></div>
+                        </div>
+                        <div class="castle-floor floor-3">
+                            <div class="castle-block"></div>
+                            <div class="castle-block"></div>
+                            <div class="castle-block"></div>
                         </div>
 
-                        <div class="input-group">
-                            <input 
-                                type="number" 
-                                id="powerInput" 
-                                placeholder="МОЩНОСТЬ (1-100)"
-                                min="1"
-                                max="100"
-                                value="50"
-                            >
-                            <select id="castleSelect" onchange="loadCastleData()">
-                                <option value="">── ВЫБЕРИТЕ ЗАМОК ──</option>
-                            </select>
-                            <button class="btn-danger" onclick="destroyCastle()" title="РАЗРУШИТЬ">💥 DESTROY</button>
+                        <div class="castle-legs">
+                            <div class="leg"></div>
+                            <div class="leg leg-right"></div>
+                            <div class="leg"></div>
                         </div>
+                    </div>
 
-                        <button class="btn-secondary" onclick="clearAllData()">🗑️ ОЧИСТИТЬ СИСТЕМУ</button>
+                    <div class="health-bar-wrapper">
+                        <div class="health-bar">
+                            <div class="health-fill" id="enemyHealthBar" style="width: 100%"></div>
+                        </div>
+                        <div class="health-text">
+                            <span id="enemyHP">1000</span> / <span id="enemyMaxHP">1000</span>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Stats -->
-                <div class="stats-grid" style="margin-top: 20px;">
-                    <div class="stat-card">
-                        <div class="label">▸ Всего ◂</div>
-                        <div class="value" id="totalCastles">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">▸ Разрушено ◂</div>
-                        <div class="value" id="destroyedCastles">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">▸ Осталось ◂</div>
-                        <div class="value" id="standingCastles">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">▸ Мощность ◂</div>
-                        <div class="value" id="totalPower">0</div>
+                    <div class="units-display">
+                        <div class="unit-icon" title="Enemy Unit 1">🗡️</div>
+                        <div class="unit-icon" title="Enemy Unit 2">🏹</div>
+                        <div class="unit-icon" title="Enemy Unit 3">🔮</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Panel -->
-            <div>
-                <div class="card">
-                    <h2>📊 ИСТОРИЯ ОПЕРАЦИЙ</h2>
-                    <div class="results-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>[ЗАМОК]</th>
-                                    <th>[СТАТУС]</th>
-                                    <th>[ДАТА/ВРЕМЯ]</th>
-                                    <th>[ДЕЙСТВИЕ]</th>
-                                </tr>
-                            </thead>
-                            <tbody id="resultsTable">
-                                <tr>
-                                    <td colspan="4" style="text-align: center; padding: 40px; color: var(--neon-cyan);">
-                                        <div class="empty-state">
-                                            <div class="empty-state-icon">📭</div>
-                                            <p>▸ СИСТЕМА ОЖИДАЕТ ДАННЫХ ◂</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <!-- Battle Log -->
+            <div class="battle-log">
+                <div class="log-title">⚔️ Battle Log</div>
+                <div id="battleLogContainer"></div>
+            </div>
 
-                    <div class="control-panel" style="margin-top: 20px;">
-                        <button class="btn-secondary" onclick="exportData()">📥 ЭКСПОРТ</button>
-                        <button class="btn-secondary" onclick="importData()">📤 ИМПОРТ</button>
-                        <input 
-                            type="file" 
-                            id="importFile" 
-                            accept=".json" 
-                            style="display: none;"
-                            onchange="handleFileImport(event)"
-                        >
-                    </div>
-                </div>
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <button class="control-btn" onclick="playerAttack()">⚔️ ATTACK</button>
+                <button class="control-btn" onclick="playerAbility()">✨ ABILITY</button>
+                <button class="control-btn" onclick="moveForward()">→ FORWARD</button>
+                <button class="control-btn" onclick="moveBackward()">← BACKWARD</button>
             </div>
         </div>
 
         <!-- Footer -->
         <footer>
-            <p>▸ CASTLE BUSTERS v2.0 ◂ КИБЕРПАНК EDITION ◂ 2024 ◂</p>
+            🏰 Castle Busters v3.0 | Современная PvP Боевая Система | Режим: 1v1
         </footer>
     </div>
 
     <script>
-        // Data Management
-        class CastleManager {
-            constructor() {
-                this.castles = this.loadFromStorage() || [];
+        // Game State
+        const gameState = {
+            playerHP: 1000,
+            playerMaxHP: 1000,
+            playerGold: 1000,
+            playerPower: 100,
+            enemyHP: 1000,
+            enemyMaxHP: 1000,
+            enemyGold: 1000,
+            enemyPower: 100,
+            round: 1,
+            roundTime: 60,
+            gameRunning: true,
+            playerPosition: 0,
+            enemyPosition: 100,
+            playerAbilityReady: true,
+            abilityName: 'Absorb',
+            damageMultiplier: 1
+        };
+
+        // Characters Database
+        const characters = {
+            grinchita: {
+                icon: '🟢',
+                name: 'Grinchita',
+                ability: 'Absorb',
+                description: 'Поглощает следующий урон без потери HP',
+                baseDamage: 60
+            },
+            summer: {
+                icon: '☀️',
+                name: 'Summer',
+                ability: 'Power Strike',
+                description: 'Мощный удар с x2 урон',
+                baseDamage: 80
+            },
+            fantom: {
+                icon: '👻',
+                name: 'Fantom',
+                ability: 'Stealth',
+                description: 'Скрывается и поглощает урон',
+                baseDamage: 50
             }
+        };
 
-            addCastle(name, power) {
-                if (!name.trim()) {
-                    this.showAlert('⚠️  ОШИБКА: Введите название замка!', 'warning');
-                    return false;
-                }
+        // Add Log Entry
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('battleLogContainer');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = message;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
 
-                const castle = {
-                    id: Date.now(),
-                    name: name.trim(),
-                    power: Math.max(1, Math.min(100, parseInt(power) || 50)),
-                    status: 'standing',
-                    dateAdded: new Date().toLocaleString('ru-RU'),
-                    dateDestroyed: null
-                };
-
-                this.castles.push(castle);
-                this.saveToStorage();
-                this.showAlert(`✓ [${castle.name}] ДОБАВЛЕН В СИСТЕМУ | МОЩНОСТЬ: ${castle.power}`, 'success');
-                return true;
-            }
-
-            destroyCastle(castleId) {
-                const castle = this.castles.find(c => c.id === castleId);
-                if (!castle) return false;
-
-                if (castle.status === 'destroyed') {
-                    this.showAlert('⚠️  ЗАМОК УЖЕ РАЗРУШЕН', 'warning');
-                    return false;
-                }
-
-                castle.status = 'destroyed';
-                castle.dateDestroyed = new Date().toLocaleString('ru-RU');
-                this.saveToStorage();
-                this.showAlert(`💥 [${castle.name}] РАЗРУШЕН! МОЩНОСТЬ УДАРА: ${castle.power}`, 'success');
-                return true;
-            }
-
-            removeCastle(castleId) {
-                this.castles = this.castles.filter(c => c.id !== castleId);
-                this.saveToStorage();
-                this.showAlert('✓ ЗАПИСЬ УДАЛЕНА ИЗ СИСТЕМЫ', 'info');
-            }
-
-            getCastle(castleId) {
-                return this.castles.find(c => c.id === castleId);
-            }
-
-            getStats() {
-                const total = this.castles.length;
-                const destroyed = this.castles.filter(c => c.status === 'destroyed').length;
-                const standing = total - destroyed;
-                const totalPower = this.castles.reduce((sum, c) => sum + c.power, 0);
-
-                return { total, destroyed, standing, totalPower };
-            }
-
-            saveToStorage() {
-                localStorage.setItem('castles_cyberpunk', JSON.stringify(this.castles));
-            }
-
-            loadFromStorage() {
-                const data = localStorage.getItem('castles_cyberpunk');
-                return data ? JSON.parse(data) : null;
-            }
-
-            clearAll() {
-                this.castles = [];
-                this.saveToStorage();
-                this.showAlert('🗑️  СИСТЕМА ОЧИЩЕНА', 'info');
-            }
-
-            showAlert(message, type = 'info') {
-                const alertsContainer = document.getElementById('alerts');
-                const alertDiv = document.createElement('div');
-                alertDiv.className = `alert alert-${type}`;
-                alertDiv.textContent = message;
-
-                alertsContainer.appendChild(alertDiv);
-
-                setTimeout(() => alertDiv.remove(), 5000);
-            }
-
-            exportToJSON() {
-                const dataStr = JSON.stringify(this.castles, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(dataBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `castle-busters-${Date.now()}.json`;
-                link.click();
-                URL.revokeObjectURL(url);
-                this.showAlert('✓ ДАННЫЕ ЭКСПОРТИРОВАНЫ', 'success');
-            }
-
-            importFromJSON(data) {
-                try {
-                    const imported = JSON.parse(data);
-                    if (Array.isArray(imported)) {
-                        this.castles = imported;
-                        this.saveToStorage();
-                        this.showAlert(`✓ ИМПОРТИРОВАНО: ${imported.length} ЗАМКОВ`, 'success');
-                        return true;
-                    }
-                } catch (e) {
-                    this.showAlert('⚠️  ОШИБКА ИМПОРТА', 'error');
-                }
-                return false;
+            if (logContainer.children.length > 15) {
+                logContainer.removeChild(logContainer.firstChild);
             }
         }
 
-        const manager = new CastleManager();
+        // Show Damage Number
+        function showDamage(castleId, damage, type = 'damage') {
+            const castle = document.getElementById(castleId);
+            const damageEl = document.createElement('div');
+            damageEl.className = `damage-number ${type === 'heal' ? 'damage-green' : 'damage-red'}`;
+            damageEl.textContent = type === 'heal' ? `+${damage}` : `-${damage}`;
+            damageEl.style.left = Math.random() * 100 + 'px';
+            damageEl.style.top = '50%';
+            castle.appendChild(damageEl);
+            setTimeout(() => damageEl.remove(), 1000);
+        }
 
-        function addCastle() {
-            const nameInput = document.getElementById('castleNameInput');
-            const powerInput = document.getElementById('powerInput');
-
-            if (manager.addCastle(nameInput.value, powerInput.value)) {
-                nameInput.value = '';
-                powerInput.value = '50';
-                updateUI();
+        // Destroy Castle Blocks
+        function destroyBlock(castleElement) {
+            const blocks = castleElement.querySelectorAll('.castle-block:not(.destroyed)');
+            if (blocks.length > 0) {
+                const randomBlock = blocks[Math.floor(Math.random() * blocks.length)];
+                randomBlock.classList.add('destroyed');
             }
         }
 
-        function destroyCastle() {
-            const select = document.getElementById('castleSelect');
-            const castleId = parseInt(select.value);
-
-            if (!castleId) {
-                manager.showAlert('⚠️  ВЫБЕРИТЕ ЦЕЛЬ', 'warning');
-                return;
-            }
-
-            if (manager.destroyCastle(castleId)) {
-                updateUI();
-            }
-        }
-
-        function clearAllData() {
-            if (confirm('⚠️  ПОДТВЕРЖДЕНИЕ: ОЧИСТИТЬ ВСЕ ДАННЫЕ?')) {
-                manager.clearAll();
-                updateUI();
-            }
-        }
-
-        function loadCastleData() {
-            const select = document.getElementById('castleSelect');
-            const castleId = parseInt(select.value);
-
-            if (!castleId) {
-                document.getElementById('castleName').textContent = '⚡ СИСТЕМА АКТИВНА ⚡';
-                document.getElementById('castleDescription').textContent = 
-                    '╔════════════════════════╗\nВыберите замок для просмотра\n╚════════════════════════╝';
-                return;
-            }
-
-            const castle = manager.getCastle(castleId);
-            if (castle) {
-                document.getElementById('castleName').textContent = `>>> ${castle.name} <<<`;
-                const statusEmoji = castle.status === 'destroyed' ? '💔' : '🏰';
-                const statusText = castle.status === 'destroyed' ? 'РАЗРУШЕН' : 'АКТИВЕН';
-                document.getElementById('castleDescription').textContent = 
-                    `${statusEmoji} [${statusText}]\nМОЩНОСТЬ: ${castle.power}/100\nДОБАВЛЕН: ${castle.dateAdded}`;
-            }
-        }
-
-        function exportData() {
-            manager.exportToJSON();
-        }
-
-        function importData() {
-            document.getElementById('importFile').click();
-        }
-
-        function handleFileImport(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    if (manager.importFromJSON(e.target.result)) {
-                        updateUI();
-                    }
-                };
-                reader.readAsText(file);
-            }
-        }
-
+        // Update UI
         function updateUI() {
-            const select = document.getElementById('castleSelect');
-            const currentValue = select.value;
-            select.innerHTML = '<option value="">── ВЫБЕРИТЕ ЗАМОК ──</option>';
+            // HP Bars
+            const playerPercent = (gameState.playerHP / gameState.playerMaxHP) * 100;
+            const enemyPercent = (gameState.enemyHP / gameState.enemyMaxHP) * 100;
 
-            manager.castles.forEach(castle => {
-                const option = document.createElement('option');
-                option.value = castle.id;
-                option.textContent = `[${castle.status === 'destroyed' ? '💔' : '🏰'}] ${castle.name}`;
-                select.appendChild(option);
-            });
+            document.getElementById('playerHealthBar').style.width = Math.max(0, playerPercent) + '%';
+            document.getElementById('enemyHealthBar').style.width = Math.max(0, enemyPercent) + '%';
 
-            select.value = currentValue;
+            // HP Text
+            document.getElementById('playerHP').textContent = Math.max(0, gameState.playerHP);
+            document.getElementById('enemyHP').textContent = Math.max(0, gameState.enemyHP);
 
-            const stats = manager.getStats();
-            document.getElementById('totalCastles').textContent = stats.total;
-            document.getElementById('destroyedCastles').textContent = stats.destroyed;
-            document.getElementById('standingCastles').textContent = stats.standing;
-            document.getElementById('totalPower').textContent = stats.totalPower;
+            // Stats
+            document.getElementById('playerGold').textContent = gameState.playerGold;
+            document.getElementById('playerPower').textContent = gameState.playerPower;
+            document.getElementById('enemyGold').textContent = gameState.enemyGold;
+            document.getElementById('enemyPower').textContent = gameState.enemyPower;
+            document.getElementById('roundNumber').textContent = gameState.round;
 
-            updateTable();
+            // Check Win/Lose
+            if (gameState.playerHP <= 0) {
+                addLog('💀 ПОРАЖЕНИЕ! Замок разрушен!');
+                gameState.gameRunning = false;
+            } else if (gameState.enemyHP <= 0) {
+                addLog('🏆 ПОБЕДА! Враг разрушен!');
+                gameState.gameRunning = false;
+            }
         }
 
-        function updateTable() {
-            const tbody = document.getElementById('resultsTable');
+        // Player Attack
+        function playerAttack() {
+            if (!gameState.gameRunning) return;
 
-            if (manager.castles.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" style="text-align: center; padding: 40px;">
-                            <div class="empty-state">
-                                <div class="empty-state-icon">📭</div>
-                                <p>▸ СИСТЕМА ОЖИДАЕТ ДАННЫХ ◂</p>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+            const baseDamage = 80;
+            const damage = Math.floor(baseDamage * gameState.damageMultiplier);
+            gameState.enemyHP -= damage;
+
+            addLog(`⚔️ GRINCHITA наносит ${damage} урона!`);
+            showDamage('enemyCastle', damage);
+            destroyBlock(document.getElementById('enemyCastle'));
+
+            gameState.damageMultiplier = 1;
+            setTimeout(() => enemyAttack(), 1000);
+            updateUI();
+        }
+
+        // Player Ability
+        function playerAbility() {
+            if (!gameState.gameRunning || !gameState.playerAbilityReady) {
+                addLog('⚠️ Способность еще на перезарядке!');
                 return;
             }
 
-            tbody.innerHTML = manager.castles.map(castle => `
-                <tr>
-                    <td><strong>[${castle.name}]</strong></td>
-                    <td>
-                        <span class="status-badge status-${castle.status}">
-                            ${castle.status === 'destroyed' ? '💥 DOWN' : '🟢 ACTIVE'}
-                        </span>
-                    </td>
-                    <td>${castle.dateDestroyed || castle.dateAdded}</td>
-                    <td>
-                        <button 
-                            class="btn-danger" 
-                            onclick="manager.removeCastle(${castle.id}); updateUI();"
-                            style="padding: 6px 12px; font-size: 0.8rem; margin: 0;"
-                        >
-                            ✕ DEL
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+            addLog(`✨ GRINCHITA активирует способность "${gameState.abilityName}"!`);
+            addLog('🛡️ Абсорб включен - следующий удар будет поглощен!');
+            
+            gameState.playerAbilityReady = false;
+            
+            // Recharge after 3 seconds
+            setTimeout(() => {
+                gameState.playerAbilityReady = true;
+                addLog('✨ Способность готова к использованию!');
+            }, 3000);
         }
 
-        window.addEventListener('load', () => {
-            updateUI();
-            manager.showAlert('✓ CASTLE BUSTERS v2.0 - КИБЕРПАНК EDITION ИНИЦИАЛИЗИРОВАНА', 'info');
-        });
+        // Enemy Attack
+        function enemyAttack() {
+            if (!gameState.gameRunning) return;
 
-        document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && e.target.id === 'castleNameInput') {
-                addCastle();
+            const damage = Math.floor(Math.random() * 50) + 50;
+            gameState.playerHP -= damage;
+
+            addLog(`💥 ВРАГ наносит ${damage} урона!`);
+            showDamage('playerCastle', damage);
+            destroyBlock(document.getElementById('playerCastle'));
+
+            updateUI();
+        }
+
+        // Movement
+        function moveForward() {
+            if (!gameState.gameRunning) return;
+            gameState.playerPosition = Math.min(gameState.playerPosition + 20, 100);
+            addLog('→ Замок движется вперед!');
+            updatePosition();
+        }
+
+        function moveBackward() {
+            if (!gameState.gameRunning) return;
+            gameState.playerPosition = Math.max(gameState.playerPosition - 20, 0);
+            addLog('← Замок движется назад!');
+            updatePosition();
+        }
+
+        function updatePosition() {
+            const playerWrapper = document.getElementById('playerCastleWrapper');
+            const enemyWrapper = document.getElementById('enemyCastleWrapper');
+            
+            const maxTranslate = window.innerWidth * 0.3;
+            const playerTranslate = (gameState.playerPosition / 100) * maxTranslate - maxTranslate / 2;
+            const enemyTranslate = ((100 - gameState.enemyPosition) / 100) * maxTranslate - maxTranslate / 2;
+            
+            playerWrapper.style.transform = `translateX(${playerTranslate}px)`;
+            enemyWrapper.style.transform = `translateX(${-enemyTranslate}px)`;
+        }
+
+        // Round Timer
+        function startRoundTimer() {
+            const timerInterval = setInterval(() => {
+                gameState.roundTime--;
+                document.getElementById('roundTimer').textContent = gameState.roundTime;
+
+                if (gameState.roundTime <= 0) {
+                    gameState.round++;
+                    gameState.roundTime = 60;
+                    gameState.playerGold += 100;
+                    gameState.enemyGold += 100;
+                    addLog(`⏱️ Раунд ${gameState.round} начинается!`);
+                    updateUI();
+                }
+            }, 1000);
+        }
+
+        // AI Logic
+        function aiTurn() {
+            if (!gameState.gameRunning) return;
+
+            const actions = [
+                () => {
+                    const damage = Math.floor(Math.random() * 40) + 70;
+                    gameState.playerHP -= damage;
+                    addLog(`🤖 Враг атакует! Урон: ${damage}`);
+                    showDamage('playerCastle', damage);
+                    destroyBlock(document.getElementById('playerCastle'));
+                },
+                () => {
+                    gameState.enemyHP = Math.min(gameState.enemyHP + 50, gameState.enemyMaxHP);
+                    addLog('❤️ Враг использует исцеление!');
+                    showDamage('enemyCastle', 50, 'heal');
+                },
+                () => {
+                    gameState.enemyPosition = Math.min(gameState.enemyPosition + 20, 100);
+                    addLog('→ Враг движется вперед!');
+                    updatePosition();
+                }
+            ];
+
+            if (Math.random() > 0.3) {
+                actions[0](); // Mostly attack
+            } else {
+                actions[Math.floor(Math.random() * actions.length)]();
             }
-        });
+
+            updateUI();
+        }
+
+        // Start Game
+        addLog('🎮 Игра начинается!');
+        addLog('🟢 GRINCHITA vs 🤖 ВРАГ');
+        addLog('⚔️ Начните атаковать!');
+
+        startRoundTimer();
+
+        // Auto AI attacks every 5 seconds
+        setInterval(() => {
+            if (gameState.gameRunning) {
+                aiTurn();
+            }
+        }, 5000);
+
+        updateUI();
     </script>
 </body>
 </html>
