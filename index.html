@@ -191,6 +191,11 @@
             transform: scale(0);
         }
 
+        .castle-block.support {
+            box-shadow: 0 0 8px rgba(255,255,255,0.1) inset;
+            border: 1px dashed var(--neon-pink);
+        }
+
         .castle-tower {
             position: absolute;
             width: 30px;
@@ -475,7 +480,7 @@
             <div class="header-right">
                 <div class="player-header">
                     <div class="stat">💰 <span id="enemyGold">1000</span></div>
-                    <div class="stat">⚡ <span id="enemyPower">100</span>%</div>
+                    <div class="stat">⚡ <span id="enemyPower">100</span>%</span></div>
                     <span>🤖 ENEMY</span>
                 </div>
             </div>
@@ -598,10 +603,10 @@
 
             <!-- Control Panel -->
             <div class="control-panel">
-                <button class="control-btn" onclick="playerAttack()">⚔️ ATTACK</button>
-                <button class="control-btn" onclick="playerAbility()">✨ ABILITY</button>
-                <button class="control-btn" onclick="moveForward()">→ FORWARD</button>
-                <button class="control-btn" onclick="moveBackward()">← BACKWARD</button>
+                <button class="control-btn" id="attackBtn">⚔️ ATTACK</button>
+                <button class="control-btn" id="abilityBtn">✨ ABILITY</button>
+                <button class="control-btn" id="forwardBtn">→ FORWARD</button>
+                <button class="control-btn" id="backBtn">← BACKWARD</button>
             </div>
         </div>
 
@@ -611,259 +616,6 @@
         </footer>
     </div>
 
-    <script>
-        // Game State
-        const gameState = {
-            playerHP: 1000,
-            playerMaxHP: 1000,
-            playerGold: 1000,
-            playerPower: 100,
-            enemyHP: 1000,
-            enemyMaxHP: 1000,
-            enemyGold: 1000,
-            enemyPower: 100,
-            round: 1,
-            roundTime: 60,
-            gameRunning: true,
-            playerPosition: 0,
-            enemyPosition: 100,
-            playerAbilityReady: true,
-            abilityName: 'Absorb',
-            damageMultiplier: 1
-        };
-
-        // Characters Database
-        const characters = {
-            grinchita: {
-                icon: '🟢',
-                name: 'Grinchita',
-                ability: 'Absorb',
-                description: 'Поглощает следующий урон без потери HP',
-                baseDamage: 60
-            },
-            summer: {
-                icon: '☀️',
-                name: 'Summer',
-                ability: 'Power Strike',
-                description: 'Мощный удар с x2 урон',
-                baseDamage: 80
-            },
-            fantom: {
-                icon: '👻',
-                name: 'Fantom',
-                ability: 'Stealth',
-                description: 'Скрывается и поглощает урон',
-                baseDamage: 50
-            }
-        };
-
-        // Add Log Entry
-        function addLog(message, type = 'info') {
-            const logContainer = document.getElementById('battleLogContainer');
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            entry.textContent = message;
-            logContainer.appendChild(entry);
-            logContainer.scrollTop = logContainer.scrollHeight;
-
-            if (logContainer.children.length > 15) {
-                logContainer.removeChild(logContainer.firstChild);
-            }
-        }
-
-        // Show Damage Number
-        function showDamage(castleId, damage, type = 'damage') {
-            const castle = document.getElementById(castleId);
-            const damageEl = document.createElement('div');
-            damageEl.className = `damage-number ${type === 'heal' ? 'damage-green' : 'damage-red'}`;
-            damageEl.textContent = type === 'heal' ? `+${damage}` : `-${damage}`;
-            damageEl.style.left = Math.random() * 100 + 'px';
-            damageEl.style.top = '50%';
-            castle.appendChild(damageEl);
-            setTimeout(() => damageEl.remove(), 1000);
-        }
-
-        // Destroy Castle Blocks
-        function destroyBlock(castleElement) {
-            const blocks = castleElement.querySelectorAll('.castle-block:not(.destroyed)');
-            if (blocks.length > 0) {
-                const randomBlock = blocks[Math.floor(Math.random() * blocks.length)];
-                randomBlock.classList.add('destroyed');
-            }
-        }
-
-        // Update UI
-        function updateUI() {
-            // HP Bars
-            const playerPercent = (gameState.playerHP / gameState.playerMaxHP) * 100;
-            const enemyPercent = (gameState.enemyHP / gameState.enemyMaxHP) * 100;
-
-            document.getElementById('playerHealthBar').style.width = Math.max(0, playerPercent) + '%';
-            document.getElementById('enemyHealthBar').style.width = Math.max(0, enemyPercent) + '%';
-
-            // HP Text
-            document.getElementById('playerHP').textContent = Math.max(0, gameState.playerHP);
-            document.getElementById('enemyHP').textContent = Math.max(0, gameState.enemyHP);
-
-            // Stats
-            document.getElementById('playerGold').textContent = gameState.playerGold;
-            document.getElementById('playerPower').textContent = gameState.playerPower;
-            document.getElementById('enemyGold').textContent = gameState.enemyGold;
-            document.getElementById('enemyPower').textContent = gameState.enemyPower;
-            document.getElementById('roundNumber').textContent = gameState.round;
-
-            // Check Win/Lose
-            if (gameState.playerHP <= 0) {
-                addLog('💀 ПОРАЖЕНИЕ! Замок разрушен!');
-                gameState.gameRunning = false;
-            } else if (gameState.enemyHP <= 0) {
-                addLog('🏆 ПОБЕДА! Враг разрушен!');
-                gameState.gameRunning = false;
-            }
-        }
-
-        // Player Attack
-        function playerAttack() {
-            if (!gameState.gameRunning) return;
-
-            const baseDamage = 80;
-            const damage = Math.floor(baseDamage * gameState.damageMultiplier);
-            gameState.enemyHP -= damage;
-
-            addLog(`⚔️ GRINCHITA наносит ${damage} урона!`);
-            showDamage('enemyCastle', damage);
-            destroyBlock(document.getElementById('enemyCastle'));
-
-            gameState.damageMultiplier = 1;
-            setTimeout(() => enemyAttack(), 1000);
-            updateUI();
-        }
-
-        // Player Ability
-        function playerAbility() {
-            if (!gameState.gameRunning || !gameState.playerAbilityReady) {
-                addLog('⚠️ Способность еще на перезарядке!');
-                return;
-            }
-
-            addLog(`✨ GRINCHITA активирует способность "${gameState.abilityName}"!`);
-            addLog('🛡️ Абсорб включен - следующий удар будет поглощен!');
-            
-            gameState.playerAbilityReady = false;
-            
-            // Recharge after 3 seconds
-            setTimeout(() => {
-                gameState.playerAbilityReady = true;
-                addLog('✨ Способность готова к использованию!');
-            }, 3000);
-        }
-
-        // Enemy Attack
-        function enemyAttack() {
-            if (!gameState.gameRunning) return;
-
-            const damage = Math.floor(Math.random() * 50) + 50;
-            gameState.playerHP -= damage;
-
-            addLog(`💥 ВРАГ наносит ${damage} урона!`);
-            showDamage('playerCastle', damage);
-            destroyBlock(document.getElementById('playerCastle'));
-
-            updateUI();
-        }
-
-        // Movement
-        function moveForward() {
-            if (!gameState.gameRunning) return;
-            gameState.playerPosition = Math.min(gameState.playerPosition + 20, 100);
-            addLog('→ Замок движется вперед!');
-            updatePosition();
-        }
-
-        function moveBackward() {
-            if (!gameState.gameRunning) return;
-            gameState.playerPosition = Math.max(gameState.playerPosition - 20, 0);
-            addLog('← Замок движется назад!');
-            updatePosition();
-        }
-
-        function updatePosition() {
-            const playerWrapper = document.getElementById('playerCastleWrapper');
-            const enemyWrapper = document.getElementById('enemyCastleWrapper');
-            
-            const maxTranslate = window.innerWidth * 0.3;
-            const playerTranslate = (gameState.playerPosition / 100) * maxTranslate - maxTranslate / 2;
-            const enemyTranslate = ((100 - gameState.enemyPosition) / 100) * maxTranslate - maxTranslate / 2;
-            
-            playerWrapper.style.transform = `translateX(${playerTranslate}px)`;
-            enemyWrapper.style.transform = `translateX(${-enemyTranslate}px)`;
-        }
-
-        // Round Timer
-        function startRoundTimer() {
-            const timerInterval = setInterval(() => {
-                gameState.roundTime--;
-                document.getElementById('roundTimer').textContent = gameState.roundTime;
-
-                if (gameState.roundTime <= 0) {
-                    gameState.round++;
-                    gameState.roundTime = 60;
-                    gameState.playerGold += 100;
-                    gameState.enemyGold += 100;
-                    addLog(`⏱️ Раунд ${gameState.round} начинается!`);
-                    updateUI();
-                }
-            }, 1000);
-        }
-
-        // AI Logic
-        function aiTurn() {
-            if (!gameState.gameRunning) return;
-
-            const actions = [
-                () => {
-                    const damage = Math.floor(Math.random() * 40) + 70;
-                    gameState.playerHP -= damage;
-                    addLog(`🤖 Враг атакует! Урон: ${damage}`);
-                    showDamage('playerCastle', damage);
-                    destroyBlock(document.getElementById('playerCastle'));
-                },
-                () => {
-                    gameState.enemyHP = Math.min(gameState.enemyHP + 50, gameState.enemyMaxHP);
-                    addLog('❤️ Враг использует исцеление!');
-                    showDamage('enemyCastle', 50, 'heal');
-                },
-                () => {
-                    gameState.enemyPosition = Math.min(gameState.enemyPosition + 20, 100);
-                    addLog('→ Враг движется вперед!');
-                    updatePosition();
-                }
-            ];
-
-            if (Math.random() > 0.3) {
-                actions[0](); // Mostly attack
-            } else {
-                actions[Math.floor(Math.random() * actions.length)]();
-            }
-
-            updateUI();
-        }
-
-        // Start Game
-        addLog('🎮 Игра начинается!');
-        addLog('🟢 GRINCHITA vs 🤖 ВРАГ');
-        addLog('⚔️ Начните атаковать!');
-
-        startRoundTimer();
-
-        // Auto AI attacks every 5 seconds
-        setInterval(() => {
-            if (gameState.gameRunning) {
-                aiTurn();
-            }
-        }, 5000);
-
-        updateUI();
-    </script>
+    <script src="game.js"></script>
 </body>
 </html>
