@@ -1,5 +1,5 @@
-// game.js — structural-collapse prototype
-// Minimal grid-based castle model with 'support' blocks and cascade collapse logic.
+// game.js — structural-collapse prototype (improved collapse)
+// Grid-based castle model with 'support' blocks and improved cascade collapse logic.
 
 document.addEventListener('DOMContentLoaded', () => {
   initGame();
@@ -26,7 +26,7 @@ function addLog(message) {
   entry.textContent = message;
   logContainer.appendChild(entry);
   logContainer.scrollTop = logContainer.scrollHeight;
-  if (logContainer.children.length > 30) logContainer.removeChild(logContainer.firstChild);
+  if (logContainer.children.length > 40) logContainer.removeChild(logContainer.firstChild);
 }
 
 function showDamage(castleId, damage, type = 'damage') {
@@ -42,9 +42,7 @@ function showDamage(castleId, damage, type = 'damage') {
 
 // Build a lightweight grid model from the DOM castle block structure
 function buildGridFromDOM(castleEl) {
-  // floors: .floor-1 (top), .floor-2, .floor-3 (bottom)
   const floors = Array.from(castleEl.querySelectorAll('.castle-floor'));
-  // Sort floors by top to bottom order in DOM (they are already in that order)
   const rows = floors.length;
   const cols = Math.max(...floors.map(f => f.querySelectorAll('.castle-block').length));
 
@@ -78,7 +76,6 @@ function buildGridFromDOM(castleEl) {
 }
 
 function markSupportsForDemo(grid, pattern = 'middle-column') {
-  // Simple patterns; default -> mark middle column as supports
   if (pattern === 'middle-column') {
     const mid = Math.floor(grid.cols / 2);
     for (let r = 0; r < grid.rows; r++) {
@@ -110,7 +107,7 @@ function initGame() {
   document.getElementById('forwardBtn').addEventListener('click', () => addLog('→ Замок движется вперед!'));
   document.getElementById('backBtn').addEventListener('click', () => addLog('← Замок движется назад!'));
 
-  // Add click-to-target functionality on enemy blocks (optional)
+  // Add click-to-target functionality on enemy blocks
   for (let r = 0; r < gameState.enemyGrid.rows; r++) {
     for (let c = 0; c < gameState.enemyGrid.cols; c++) {
       const cell = gameState.enemyGrid.cells[r][c];
@@ -139,7 +136,6 @@ function initGame() {
 
 function playerAttack() {
   if (!gameState.gameRunning) return;
-  // Prefer to hit a support block if exists
   const target = findPriorityTarget(gameState.enemyGrid);
   if (!target) {
     addLog('⚠️ Нечего бить!');
@@ -161,7 +157,7 @@ function playerAbility() {
 }
 
 function findPriorityTarget(grid) {
-  // First search for supports (highest priority), else any block
+  // First search for supports (highest priority), else any block (bottom-up)
   for (let r = 0; r < grid.rows; r++) {
     for (let c = 0; c < grid.cols; c++) {
       const cell = grid.cells[r][c];
@@ -197,6 +193,8 @@ function hitBlock(which, r, c, damage) {
   addLog(`🧱 Блок [${which}] r:${r} c:${c} получил удар (hp -> ${cell.hp})`);
   if (cell.hp <= 0) {
     destroyBlock(grid, r, c, which);
+    // After a block is destroyed, recompute supports and collapse unsupported parts
+    collapseUnsupported(grid, which);
   }
 
   updateUI();
@@ -205,48 +203,81 @@ function hitBlock(which, r, c, damage) {
 function destroyBlock(grid, r, c, which) {
   const cell = grid.cells[r][c];
   if (!cell || cell.type === 'empty') return;
-  // Visual
   if (cell.el) cell.el.classList.add('destroyed');
   cell.type = 'empty';
   cell.hp = 0;
-
-  addLog(`💥 Блок разрушен в колонке c:${c} (r:${r}) — проверяем опоры...`);
-
-  // If destroyed block was support, trigger cascade collapse of that column
-  if (cell.el && cell.el.classList.contains('support')) {
-    addLog('⚠️ Опора сброшена — запускаем цепной обвал столбца');
-    cascadeCollapse(grid, c, which);
-  }
+  addLog(`💥 Блок разрушен в колонке c:${c} (r:${r})`);
 }
 
-function cascadeCollapse(grid, colIndex, which) {
-  // Simple rule: remove all remaining blocks in the same column (simulate that the floor lost support)
-  let removed = 0;
-  for (let r = 0; r < grid.rows; r++) {
-    const cell = grid.cells[r][colIndex];
-    if (cell && cell.type !== 'empty') {
-      if (cell.el) cell.el.classList.add('destroyed');
-      cell.type = 'empty';
-      cell.hp = 0;
-      removed++;
+function recomputeSupported(grid) {
+  const rows = grid.rows;
+  const cols = grid.cols;
+  const supported = Array.from({ length: rows }, () => Array(cols).fill(false));
+
+  // Bottom row blocks are supported by ground if present
+  for (let c = 0; c < cols; c++) {
+    const cell = grid.cells[rows - 1][c];
+    if (cell && cell.type !== 'empty') supported[rows - 1][c] = true;
+  }
+
+  // Propagate support upward: a block is supported if any of the three blocks beneath it is supported
+  for (let r = rows - 2; r >= 0; r--) {
+    for (let c = 0; c < cols; c++) {
+      const cell = grid.cells[r][c];
+      if (!cell || cell.type === 'empty') continue;
+
+      let belowSupported = false;
+      for (let dc = -1; dc <= 1; dc++) {
+        const nc = c + dc;
+        if (nc < 0 || nc >= cols) continue;
+        if (supported[r + 1][nc]) {
+          // ensure there's an actual block below at [r+1][nc]
+          const belowCell = grid.cells[r + 1][nc];
+          if (belowCell && belowCell.type !== 'empty') {
+            belowSupported = true;
+            break;
+          }
+        }
+      }
+
+      if (belowSupported) supported[r][c] = true;
     }
   }
-  // Apply additional castle HP damage proportional to removed blocks
-  const extraDamage = removed * 15; // tuning parameter
-  if (which === 'enemy') {
-    gameState.enemyHP = Math.max(0, gameState.enemyHP - extraDamage);
-    showDamage('enemyCastle', extraDamage);
-  } else {
-    gameState.playerHP = Math.max(0, gameState.playerHP - extraDamage);
-    showDamage('playerCastle', extraDamage);
+
+  return supported;
+}
+
+function collapseUnsupported(grid, which) {
+  const supported = recomputeSupported(grid);
+  let removed = 0;
+  for (let r = 0; r < grid.rows; r++) {
+    for (let c = 0; c < grid.cols; c++) {
+      const cell = grid.cells[r][c];
+      if (cell && cell.type !== 'empty' && !supported[r][c]) {
+        if (cell.el) cell.el.classList.add('destroyed');
+        cell.type = 'empty';
+        cell.hp = 0;
+        removed++;
+      }
+    }
   }
-  addLog(`🏚️ Обвал уничтожил ${removed} блок(ов) в колонке ${colIndex}, доп. урон ${extraDamage}`);
-  updateUI();
+
+  if (removed > 0) {
+    const extraDamage = removed * 12; // tuning parameter
+    if (which === 'enemy') {
+      gameState.enemyHP = Math.max(0, gameState.enemyHP - extraDamage);
+      showDamage('enemyCastle', extraDamage);
+    } else {
+      gameState.playerHP = Math.max(0, gameState.playerHP - extraDamage);
+      showDamage('playerCastle', extraDamage);
+    }
+    addLog(`🏚️ Обвал уничтожил ${removed} блок(ов), доп. урон ${extraDamage}`);
+    updateUI();
+  }
 }
 
 function aiTurn() {
   if (!gameState.gameRunning) return;
-  // AI prefers to hit player's supports first
   const target = findPriorityTarget(gameState.playerGrid);
   if (!target) return;
   const damage = Math.floor(Math.random() * 60) + 40;
