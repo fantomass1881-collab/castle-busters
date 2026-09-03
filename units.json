@@ -1,0 +1,65 @@
+{
+  "units": [
+    {
+      "id": "wrecker",
+      "name": "Wrecker",
+      "role": "Штурмовик",
+      "tier": "S",
+      "description": "Классический \"ломатель\": его снаряды эффективно выбивают стены и опоры.",
+      "damage": 80,
+      "structure_damage": 2,
+      "area": 0,
+      "cooldown": 5
+    },
+    {
+      "id": "bomber",
+      "name": "Bomber",
+      "role": "Осадные снаряды",
+      "tier": "S",
+      "description": "Бомбами выламывает стены и башни, наносит урон по площади.",
+      "damage": 120,
+      "structure_damage": 2,
+      "area": 3,
+      "cooldown": 6
+    },
+    {
+      "id": "napalmer",
+      "name": "Napalmer",
+      "role": "Зонный контроль",
+      "tier": "A",
+      "description": "Заливает огнём зоны, наносит урон со временем.",
+      "damage": 10,
+      "dot": 5,
+      "duration": 6,
+      "cooldown": 8
+    },
+    {
+      "id": "scout",
+      "name": "Scout",
+      "role": "Разведка",
+      "tier": "A",
+      "description": "Быстрый стрелок, вскрывает карту и добивает цели.",
+      "damage": 30,
+      "speed": 8,
+      "cooldown": 2
+    },
+    {
+      "id": "fairy",
+      "name": "Fairy",
+      "role": "Поддержка",
+      "tier": "A",
+      "description": "Лечит союзных юнитов и продлевает жизнь обороны.",
+      "heal": 80,
+      "cooldown": 10
+    },
+    {
+      "id": "crow",
+      "name": "Crow",
+      "role": "Обход",
+      "tier": "B",
+      "description": "Атакует по необычным траекториям, забрасывая снаряды в труднодоступные места.",
+      "damage": 40,
+      "cooldown": 4
+    }
+  ]
+}
