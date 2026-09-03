@@ -1,0 +1,13 @@
+{
+  "name": "castle-busters-server",
+  "version": "0.1.0",
+  "description": "Simple matchmaking + relay server for Castle Busters (prototype)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.1"
+  }
+}
