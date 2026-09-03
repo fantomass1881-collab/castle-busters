@@ -1,6 +1,5 @@
 // game.js — structural-collapse prototype (raycast + animated collapse)
-// Grid-based castle model with 'support' blocks, improved cascade collapse logic,
-// line-of-fire raycast (Bresenham) and staggered destruction animation.
+// Extended: loads units configuration from units.json and adds Restart button handler (MVP)
 
 document.addEventListener('DOMContentLoaded', () => {
   initGame();
@@ -18,11 +17,14 @@ const gameState = {
   enemyGrid: null,
   playerAbilityReady: true,
   abilityName: 'Absorb',
-  lineMode: false
+  lineMode: false,
+  unitParams: {}, // loaded from units.json
+  defaultPlayerUnit: 'wrecker'
 };
 
 function addLog(message) {
   const logContainer = document.getElementById('battleLogContainer');
+  if (!logContainer) return;
   const entry = document.createElement('div');
   entry.className = 'log-entry';
   entry.textContent = message;
@@ -33,6 +35,7 @@ function addLog(message) {
 
 function showDamage(castleId, damage, type = 'damage') {
   const castle = document.getElementById(castleId);
+  if (!castle) return;
   const damageEl = document.createElement('div');
   damageEl.className = `damage-number ${type === 'heal' ? 'damage-green' : 'damage-red'}`;
   damageEl.textContent = type === 'heal' ? `+${damage}` : `-${damage}`;
@@ -40,6 +43,25 @@ function showDamage(castleId, damage, type = 'damage') {
   damageEl.style.top = 40 + Math.random() * 40 + 'px';
   castle.appendChild(damageEl);
   setTimeout(() => damageEl.remove(), 1200);
+}
+
+// Load units configuration (units.json)
+function loadUnitsConfig() {
+  return fetch('units.json')
+    .then(r => {
+      if (!r.ok) throw new Error('units.json not found');
+      return r.json();
+    })
+    .then(cfg => {
+      if (cfg && Array.isArray(cfg.units)) {
+        gameState.unitParams = {};
+        for (const u of cfg.units) gameState.unitParams[u.id] = u;
+        console.log('Units config loaded:', gameState.unitParams);
+      } else console.warn('units.json has unexpected format');
+    })
+    .catch(err => {
+      console.warn('Could not load units.json, using defaults. Error:', err);
+    });
 }
 
 // Build a lightweight grid model from the DOM castle block structure
@@ -85,70 +107,83 @@ function markSupportsForDemo(grid, pattern = 'middle-column') {
       if (cell && cell.type === 'block') {
         cell.type = 'support';
         cell.hp = 2; // supports are harder
-        cell.el.classList.add('support');
-        cell.el.title = 'Support - hit to collapse the section';
+        if (cell.el) cell.el.classList.add('support');
+        if (cell.el) cell.el.title = 'Support - hit to collapse the section';
       }
     }
   }
 }
 
 function initGame() {
-  const playerCastle = document.getElementById('playerCastle');
-  const enemyCastle = document.getElementById('enemyCastle');
+  // Load units config first, then initialize
+  loadUnitsConfig().then(() => {
+    const playerCastle = document.getElementById('playerCastle');
+    const enemyCastle = document.getElementById('enemyCastle');
 
-  gameState.playerGrid = buildGridFromDOM(playerCastle);
-  gameState.enemyGrid = buildGridFromDOM(enemyCastle);
+    gameState.playerGrid = buildGridFromDOM(playerCastle);
+    gameState.enemyGrid = buildGridFromDOM(enemyCastle);
 
-  // Mark supports for demo on both castles
-  markSupportsForDemo(gameState.playerGrid);
-  markSupportsForDemo(gameState.enemyGrid);
+    // Mark supports for demo on both castles
+    markSupportsForDemo(gameState.playerGrid);
+    markSupportsForDemo(gameState.enemyGrid);
 
-  // Hook up controls
-  document.getElementById('attackBtn').addEventListener('click', playerAttack);
-  document.getElementById('abilityBtn').addEventListener('click', playerAbility);
-  document.getElementById('forwardBtn').addEventListener('click', () => addLog('→ Замок движется вперед!'));
-  document.getElementById('backBtn').addEventListener('click', () => addLog('← Замок движется назад!'));
-  const lineBtn = document.getElementById('lineBtn');
-  if (lineBtn) lineBtn.addEventListener('click', toggleLineMode);
+    // Hook up controls
+    document.getElementById('attackBtn').addEventListener('click', playerAttack);
+    document.getElementById('abilityBtn').addEventListener('click', playerAbility);
+    document.getElementById('forwardBtn').addEventListener('click', () => addLog('→ Замок движется вперед!'));
+    document.getElementById('backBtn').addEventListener('click', () => addLog('← Замок движется назад!'));
+    const lineBtn = document.getElementById('lineBtn');
+    if (lineBtn) lineBtn.addEventListener('click', toggleLineMode);
 
-  // Add click-to-target functionality on enemy blocks
-  for (let r = 0; r < gameState.enemyGrid.rows; r++) {
-    for (let c = 0; c < gameState.enemyGrid.cols; c++) {
-      const cell = gameState.enemyGrid.cells[r][c];
-      if (cell && cell.el) {
-        cell.el.style.cursor = 'pointer';
-        cell.el.addEventListener('click', () => {
-          if (!gameState.gameRunning) return;
-          if (gameState.lineMode) {
-            // Plan line from player's bottom center to clicked cell
-            const start = { r: gameState.enemyGrid.rows - 1, c: Math.floor(gameState.enemyGrid.cols / 2) };
-            const path = bresenhamLine(start.r, start.c, r, c);
-            const cost = computeLineCost(gameState.enemyGrid, path);
-            previewLine(gameState.enemyGrid, path);
-            addLog(`📏 Линия: цель r:${r} c:${c}, стоимость = ${cost} (supports cost more)`);
-            // Fire after short delay to let player see preview
-            setTimeout(() => {
-              fireLine(gameState.enemyGrid, path);
-            }, 600);
-          } else {
-            addLog(`🔎 Вы стреляете в блок [r:${r} c:${c}]`);
-            hitBlock('enemy', r, c, 80);
-          }
-        });
+    // Restart button (added in index.html)
+    const restartBtn = document.getElementById('restartBtn');
+    if (restartBtn) restartBtn.addEventListener('click', () => {
+      // Simple safe restart: reload page to ensure full state reset
+      location.reload();
+    });
+
+    // Add click-to-target functionality on enemy blocks
+    for (let r = 0; r < gameState.enemyGrid.rows; r++) {
+      for (let c = 0; c < gameState.enemyGrid.cols; c++) {
+        const cell = gameState.enemyGrid.cells[r][c];
+        if (cell && cell.el) {
+          cell.el.style.cursor = 'pointer';
+          cell.el.addEventListener('click', () => {
+            if (!gameState.gameRunning) return;
+            if (gameState.lineMode) {
+              // Plan line from player's bottom center to clicked cell
+              const start = { r: gameState.enemyGrid.rows - 1, c: Math.floor(gameState.enemyGrid.cols / 2) };
+              const path = bresenhamLine(start.r, start.c, r, c);
+              const cost = computeLineCost(gameState.enemyGrid, path);
+              previewLine(gameState.enemyGrid, path);
+              addLog(`📏 Линия: цель r:${r} c:${c}, стоимость = ${cost} (supports cost more)`);
+              // Fire after short delay to let player see preview
+              setTimeout(() => {
+                fireLine(gameState.enemyGrid, path);
+              }, 600);
+            } else {
+              addLog(`🔎 Вы стреляете в блок [r:${r} c:${c}]`);
+              // Use configured default unit damage if available
+              const defaultUnit = gameState.unitParams[gameState.defaultPlayerUnit];
+              const dmg = defaultUnit && defaultUnit.damage ? defaultUnit.damage : 80;
+              hitBlock('enemy', r, c, dmg);
+            }
+          });
+        }
       }
     }
-  }
 
-  // Start AI loop
-  setInterval(() => {
-    if (gameState.gameRunning) aiTurn();
-  }, 4000);
+    // Start AI loop
+    setInterval(() => {
+      if (gameState.gameRunning) aiTurn();
+    }, 4000);
 
-  // Round timer
-  startRoundTimer();
+    // Round timer
+    startRoundTimer();
 
-  addLog('🎮 Игра начинается! (demo: supports highlighted). Нажмите LINE FIRE для режима линий.');
-  updateUI();
+    addLog('🎮 Игра начинается! (demo: supports highlighted). Нажмите LINE FIRE для режима линий.');
+    updateUI();
+  });
 }
 
 function toggleLineMode() {
@@ -163,8 +198,11 @@ function playerAttack() {
     addLog('⚠️ Нечего бить!');
     return;
   }
+  // Use configured default unit damage if available
+  const defaultUnit = gameState.unitParams[gameState.defaultPlayerUnit];
+  const dmg = defaultUnit && defaultUnit.damage ? defaultUnit.damage : 80;
   addLog(`⚔️ Вы атакуете блок r:${target.r} c:${target.c}`);
-  hitBlock('enemy', target.r, target.c, 80);
+  hitBlock('enemy', target.r, target.c, dmg);
 }
 
 function playerAbility() {
@@ -404,18 +442,25 @@ function aiTurn() {
 function updateUI() {
   const playerPercent = (gameState.playerHP / gameState.playerMaxHP) * 100;
   const enemyPercent = (gameState.enemyHP / gameState.enemyMaxHP) * 100;
-  document.getElementById('playerHealthBar').style.width = Math.max(0, playerPercent) + '%';
-  document.getElementById('enemyHealthBar').style.width = Math.max(0, enemyPercent) + '%';
-  document.getElementById('playerHP').textContent = Math.max(0, gameState.playerHP);
-  document.getElementById('enemyHP').textContent = Math.max(0, gameState.enemyHP);
+  const phb = document.getElementById('playerHealthBar');
+  const ehb = document.getElementById('enemyHealthBar');
+  const php = document.getElementById('playerHP');
+  const ehp = document.getElementById('enemyHP');
+  if (phb) phb.style.width = Math.max(0, playerPercent) + '%';
+  if (ehb) ehb.style.width = Math.max(0, enemyPercent) + '%';
+  if (php) php.textContent = Math.max(0, gameState.playerHP);
+  if (ehp) ehp.textContent = Math.max(0, gameState.enemyHP);
 
   if (gameState.playerHP <= 0 && gameState.gameRunning) {
     addLog('💀 ПОРАЖЕНИЕ! Ваш замок рухнул.');
     gameState.gameRunning = false;
+    // Show defeat modal (simple alert for MVP - will replace with nice modal later)
+    setTimeout(() => { if (confirm('Вы проиграли. Перезапустить?')) location.reload(); }, 200);
   }
   if (gameState.enemyHP <= 0 && gameState.gameRunning) {
     addLog('🏆 ПОБЕДА! Враг уничтожен.');
     gameState.gameRunning = false;
+    setTimeout(() => { if (confirm('Вы победили! Перезапустить?')) location.reload(); }, 200);
   }
 }
 
@@ -423,7 +468,8 @@ function startRoundTimer() {
   const timerInterval = setInterval(() => {
     if (!gameState.gameRunning) return;
     gameState.roundTime--;
-    document.getElementById('roundTimer').textContent = gameState.roundTime;
+    const rt = document.getElementById('roundTimer');
+    if (rt) rt.textContent = gameState.roundTime;
     if (gameState.roundTime <= 0) {
       gameState.round++;
       gameState.roundTime = 60;
