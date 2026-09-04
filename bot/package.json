@@ -1,0 +1,14 @@
+{
+  "name": "castle-busters-bot",
+  "version": "0.1.0",
+  "description": "Example Telegraf bot to receive WebApp data from Castle Busters",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "send-button": "node send_button.js"
+  },
+  "dependencies": {
+    "telegraf": "^4.12.3",
+    "node-fetch": "^2.6.7"
+  }
+}
