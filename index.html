@@ -1,7 +1,37 @@
-@@
-     <script src="game.js"></script>
-+    <!-- Optional network helper for Online prototype -->
-+    <script src="/socket.io/socket.io.js"></script>
-+    <script src="network.js"></script>
-   </body>
- </html>
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Castle Busters</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div id="gameContainer">
+      <!-- game UI (index.html original content assumed present) -->
+      <div id="playerCastle" class="castle"></div>
+      <div id="enemyCastle" class="castle"></div>
+      <div id="hud">
+        <div id="playerHealthBarContainer"><div id="playerHealthBar"></div><span id="playerHP"></span></div>
+        <div id="enemyHealthBarContainer"><div id="enemyHealthBar"></div><span id="enemyHP"></span></div>
+        <div id="controls">
+          <button id="attackBtn">ATTACK</button>
+          <button id="abilityBtn">ABILITY</button>
+          <button id="lineBtn">LINE FIRE</button>
+          <button id="restartBtn">RESTART</button>
+        </div>
+        <div id="roundTimer">60</div>
+      </div>
+      <div id="battleLogContainer"></div>
+    </div>
+
+    <!-- Network + Telegram helpers -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="network.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="telegram-webapp.js"></script>
+
+    <!-- Main game script -->
+    <script src="game.js"></script>
+  </body>
+</html>
