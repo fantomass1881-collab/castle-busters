@@ -1,340 +1,115 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Castle Busters — PvP Battle</title>
-
-    <!-- Telegram WebApp SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --dark-bg: #0a0e1a;
-            --dark-panel: #12182b;
-            --neon-cyan: #00f5ff;
-            --neon-pink: #ff2d78;
-            --neon-green: #39ff8e;
-            --neon-yellow: #ffd166;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            background:
-                radial-gradient(ellipse at 20% 0%, rgba(0,245,255,0.06), transparent 50%),
-                radial-gradient(ellipse at 80% 100%, rgba(255,45,120,0.06), transparent 50%),
-                var(--dark-bg);
-            color: var(--neon-cyan);
-            font-family: 'Roboto Mono', monospace;
-            min-height: 100vh;
-            padding: 10px;
-        }
-
-        .container { max-width: 900px; margin: 0 auto; }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 10px 14px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(0,245,255,0.25);
-            border-radius: 10px;
-            background: var(--dark-panel);
-        }
-        header h1 {
-            font-family: 'Orbitron', monospace;
-            font-size: 1.25rem;
-            letter-spacing: 2px;
-            text-shadow: 0 0 12px rgba(0,245,255,0.6);
-        }
-        .round-timer {
-            font-family: 'Orbitron', monospace;
-            font-size: 1.1rem;
-            color: var(--neon-yellow);
-            border: 1px solid rgba(255,209,102,0.35);
-            border-radius: 8px;
-            padding: 4px 12px;
-        }
-
-        /* HUD */
-        .hud {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-        .hp-panel { flex: 1; }
-        .hp-label {
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }
-        .hp-label.player { color: var(--neon-green); }
-        .hp-label.enemy { color: var(--neon-pink); text-align: right; }
-        .hp-bar-container {
-            height: 14px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(0,245,255,0.2);
-            border-radius: 7px;
-            overflow: hidden;
-        }
-        .hp-bar {
-            height: 100%;
-            width: 100%;
-            border-radius: 7px;
-            transition: width 0.35s ease;
-        }
-        #playerHealthBar { background: linear-gradient(90deg, #00f5ff, var(--neon-green)); }
-        #enemyHealthBar  { background: linear-gradient(90deg, var(--neon-pink), #ffd166); float: right; }
-        .hp-numbers {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            margin-top: 3px;
-        }
-
-        /* Battle area */
-        .battle-area {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            gap: 10px;
-            border: 1px solid rgba(0,245,255,0.25);
-            border-radius: 12px;
-            background: linear-gradient(180deg, var(--dark-panel) 0%, #0c1122 100%);
-            padding: 16px 12px 12px;
-            margin-bottom: 10px;
-            overflow-x: auto;
-        }
-
-        .castle {
-            position: relative;
-            width: 46%;
-            min-width: 150px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            padding: 8px;
-            border-radius: 8px;
-        }
-        #playerCastle { background: rgba(57,255,142,0.04); }
-        #enemyCastle  { background: rgba(255,45,120,0.04); }
-
-        .castle-floor {
-            display: flex;
-            gap: 3px;
-            align-items: flex-end;
-        }
-
-        .castle-block {
-            width: 22px;
-            height: 22px;
-            background: linear-gradient(180deg, #2a3352 0%, #1b2340 100%);
-            border: 1px solid rgba(0,245,255,0.35);
-            border-radius: 4px;
-            transition: transform 0.25s, opacity 0.25s;
-        }
-        .castle-block.support {
-            background: linear-gradient(180deg, #52233f 0%, #331a2b 100%);
-            border-color: var(--neon-pink);
-            box-shadow: 0 0 8px rgba(255,45,120,0.45);
-        }
-        .castle-block.highlight {
-            background: var(--neon-yellow);
-            box-shadow: 0 0 12px rgba(255,209,102,0.8);
-        }
-        .castle-block.destroyed {
-            transform: scale(0.2) rotate(45deg);
-            opacity: 0;
-        }
-
-        .damage-number {
-            position: absolute;
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
-            font-size: 1rem;
-            z-index: 50;
-            animation: floatUp 1.2s ease-out forwards;
-            pointer-events: none;
-        }
-        .damage-red { color: var(--neon-pink); }
-        .damage-green { color: var(--neon-green); }
-        @keyframes floatUp {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-40px); opacity: 0; }
-        }
-
-        .vs-badge {
-            font-family: 'Orbitron', monospace;
-            font-weight: 900;
-            color: var(--neon-yellow);
-            text-shadow: 0 0 14px rgba(255,209,102,0.7);
-            align-self: center;
-        }
-
-        /* Battle log */
-        .battle-log {
-            border: 1px solid rgba(0,245,255,0.2);
-            border-radius: 10px;
-            background: rgba(10,14,26,0.8);
-            height: 130px;
-            overflow-y: auto;
-            padding: 8px 10px;
-            font-size: 0.78rem;
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
-        .log-entry { color: #9fd8e8; }
-        .log-entry::before { content: '▸ '; color: rgba(0,245,255,0.4); }
-
-        /* Controls */
-        .control-panel {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            padding: 12px;
-            border: 1px solid rgba(0,245,255,0.25);
-            border-radius: 12px;
-            background: var(--dark-panel);
-            margin-bottom: 10px;
-        }
-        .control-btn {
-            font-family: 'Orbitron', monospace;
-            font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: var(--neon-cyan);
-            background: rgba(0,245,255,0.06);
-            border: 1px solid rgba(0,245,255,0.4);
-            border-radius: 8px;
-            padding: 10px 14px;
-            cursor: pointer;
-            transition: all 0.15s;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .control-btn:hover {
-            background: rgba(0,245,255,0.15);
-            box-shadow: 0 0 14px rgba(0,245,255,0.35);
-        }
-        .control-btn:active { transform: scale(0.96); }
-        .control-btn.attack {
-            color: var(--dark-bg);
-            background: var(--neon-cyan);
-            border-color: var(--neon-cyan);
-        }
-        .control-btn.ability {
-            color: var(--dark-bg);
-            background: var(--neon-green);
-            border-color: var(--neon-green);
-        }
-        .control-btn.restart {
-            color: var(--dark-bg);
-            background: var(--neon-pink);
-            border-color: var(--neon-pink);
-        }
-
-        footer {
-            text-align: center;
-            font-size: 0.75rem;
-            color: rgba(0,245,255,0.45);
-            padding: 8px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1d2340">
+  <title>Castle Busters — Осада замков</title>
+  <meta name="description" content="Castle Busters: дуэль замков на колёсах. Стреляй юнитами, ломай стены и обрушивай вражескую крепость.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%224%22 y=%2210%22 width=%2224%22 height=%2216%22 fill=%22%23c9d1d9%22 stroke=%22%231d2340%22 stroke-width=%222%22/%3E%3Cpath d=%22M6 10 L10 3 L14 10Z M18 10 L22 3 L26 10Z%22 fill=%22%233d7bf0%22 stroke=%22%231d2340%22 stroke-width=%222%22/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Russo+One&display=swap&subset=cyrillic" rel="stylesheet">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🏰 CASTLE BUSTERS</h1>
-            <div class="round-timer">⏱ <span id="roundTimer">60</span>s</div>
-        </header>
+  <canvas id="game" aria-label="Поле боя"></canvas>
 
-        <!-- HUD -->
-        <div class="hud">
-            <div class="hp-panel">
-                <div class="hp-label player">Ваш замок</div>
-                <div class="hp-bar-container"><div id="playerHealthBar" class="hp-bar"></div></div>
-            </div>
-            <div class="hp-panel">
-                <div class="hp-label enemy">Замок врага</div>
-                <div class="hp-bar-container"><div id="enemyHealthBar" class="hp-bar"></div></div>
-            </div>
-        </div>
-        <div class="hp-numbers">
-            <span id="playerHP" style="color:var(--neon-green)">1000</span>
-            <span id="enemyHP" style="color:var(--neon-pink)">1000</span>
-        </div>
-
-        <!-- Battle area -->
-        <div class="battle-area">
-            <div id="playerCastle" class="castle">
-                <div class="castle-floor">
-                    <div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div>
-                </div>
-                <div class="castle-floor">
-                    <div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div>
-                </div>
-                <div class="castle-floor">
-                    <div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div>
-                </div>
-                <div class="castle-floor">
-                    <div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div>
-                </div>
-                <div class="castle-floor">
-                    <div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div>
-                </div>
-            </div>
-
-            <div class="vs-badge">VS</div>
-
-            <div id="enemyCastle" class="castle">
-                <div class="castle-floor">
-                    <div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div>
-                </div>
-                <div class="castle-floor">
-                    <div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div>
-                </div>
-                <div class="castle-floor">
-                    <div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div>
-                </div>
-                <div class="castle-floor">
-                    <div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div>
-                </div>
-                <div class="castle-floor">
-                    <div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div><div class="castle-block"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Battle log -->
-        <div id="battleLogContainer" class="battle-log"></div>
-
-        <!-- Controls -->
-        <div class="control-panel">
-            <button class="control-btn attack" id="attackBtn">⚔️ ATTACK</button>
-            <button class="control-btn" id="lineBtn">📏 LINE FIRE</button>
-            <button class="control-btn ability" id="abilityBtn">✨ ABILITY</button>
-            <button class="control-btn" id="forwardBtn">→ FORWARD</button>
-            <button class="control-btn" id="backBtn">← BACKWARD</button>
-            <button class="control-btn restart" id="restartBtn">🔄 RESTART</button>
-        </div>
-
-        <footer>
-            🏰 Castle Busters v3.0 | Современная PvP Боевая Система | Режим: 1v1
-        </footer>
+  <section id="loading" class="screen">
+    <div class="logo">
+      <div class="logo-title">CASTLE<br><span class="b">BUSTERS</span></div>
+      <div class="logo-sub">Осада замков на колёсах</div>
     </div>
+    <div class="tap">
+      <div class="loadbar"><div id="loadfill"></div></div>
+      <button id="btn-start" class="btn btn-gold btn-big hidden">Играть</button>
+    </div>
+  </section>
 
-    <script src="telegram-webapp.js"></script>
-    <script src="game.js"></script>
+  <section id="menu" class="screen hidden">
+    <div class="topbar">
+      <div class="player-chip">
+        <div class="avatar" id="m-avatar">И<span class="lvl" id="m-level">1</span></div>
+        <div><div class="nm" id="m-name">Игрок</div><div class="xpbar"><div id="m-xp"></div></div></div>
+      </div>
+      <div class="spacer"></div>
+      <div class="pill"><span class="ico ico-cup">🏆</span><span id="m-trophies">0</span></div>
+      <div class="pill"><span class="ico ico-coin"></span><span id="m-coins">0</span></div>
+      <button class="icon-btn" id="btn-sound" aria-label="Звук">🔊</button>
+    </div>
+    <div class="logo"><div class="logo-title">CASTLE<br><span class="b">BUSTERS</span></div></div>
+    <div class="home-center" id="home">
+      <div class="league-card" id="league-card">
+        <div class="league-badge" id="m-badge"><span>Б</span></div>
+        <div class="league-info">
+          <div class="ln" id="m-league">Бронза</div>
+          <div class="an" id="m-arena">Долина водопадов</div>
+          <div class="progress"><div id="m-prog"></div></div>
+          <div class="pt" id="m-next">До Серебра: 300</div>
+        </div>
+      </div>
+      <button class="btn btn-gold btn-big" id="btn-battle">В бой</button>
+    </div>
+    <div id="sheet" class="sheet hidden"><div class="sheet-inner" id="sheet-inner"></div></div>
+    <nav class="nav" id="nav">
+      <button data-tab="home" class="active"><span class="ni">🏰</span>Главная</button>
+      <button data-tab="squad"><span class="ni">🛡️</span>Отряд</button>
+      <button data-tab="forge"><span class="ni">⚒️</span>Кузница</button>
+      <button data-tab="arena"><span class="ni">🏆</span>Арены</button>
+    </nav>
+  </section>
+
+  <section id="match" class="screen hidden">
+    <div id="mm-search">
+      <div class="mm-spinner" style="margin:0 auto 20px"></div>
+      <div class="mm-title" style="text-align:center">Поиск соперника…</div>
+      <div class="mm-sub" id="mm-arena" style="text-align:center;margin-top:8px"></div>
+    </div>
+    <div id="mm-found" class="hidden" style="text-align:center">
+      <div class="mm-title" style="margin-bottom:18px">Соперник найден</div>
+      <div class="vs-wrap">
+        <div class="vs-card me"><div class="avatar" id="vs-me-av">И</div><div class="nm" id="vs-me">Вы</div><div class="tr" id="vs-me-tr"></div></div>
+        <div class="vs-big">VS</div>
+        <div class="vs-card op"><div class="avatar" id="vs-op-av" style="background:#a82e2a">С</div><div class="nm" id="vs-op">Соперник</div><div class="tr" id="vs-op-tr"></div></div>
+      </div>
+    </div>
+    <button class="btn btn-small" id="btn-cancel-mm" style="margin-top:10px">Отмена</button>
+  </section>
+
+  <div id="hud" class="hidden">
+    <div class="hud-top">
+      <div class="side left">
+        <div class="row1"><div class="avatar" id="h-pav">И</div><div class="who"><div class="nm" id="h-pname">Вы</div><div class="tr" id="h-ptr"></div></div><div class="pct" id="h-ppct">100%</div></div>
+        <div class="cbar"><div id="h-pbar" style="width:100%"></div></div>
+        <div class="minis" id="h-pminis"></div>
+      </div>
+      <div class="center-col">
+        <div class="vs-chip">VS</div>
+        <div class="round-chip" id="h-round">Раунд 1</div>
+        <div class="timer" id="h-timer">20</div>
+        <div class="wind hidden" id="h-wind"></div>
+        <button class="icon-btn" id="btn-pause" aria-label="Пауза">II</button>
+      </div>
+      <div class="side right">
+        <div class="row1"><div class="avatar" id="h-eav">С</div><div class="who"><div class="nm" id="h-ename">Соперник</div><div class="tr" id="h-etr"></div></div><div class="pct" id="h-epct">100%</div></div>
+        <div class="cbar"><div id="h-ebar" style="width:100%"></div></div>
+        <div class="minis" id="h-eminis"></div>
+      </div>
+    </div>
+    <div class="hint hidden" id="hint"></div>
+    <button class="btn btn-green use-btn hidden" id="btn-use">Применить</button>
+    <div class="hud-bottom"><div class="cards" id="cards"></div></div>
+  </div>
+
+  <div id="banner" class="banner hidden"><div class="bt" id="banner-t"></div><div class="bs hidden" id="banner-s"></div></div>
+  <div id="modal" class="modal hidden"><div class="modal-box" id="modal-box"></div></div>
+
+  <script src="js/config.js?v=3"></script>
+  <script src="js/audio.js?v=3"></script>
+  <script src="js/save.js?v=3"></script>
+  <script src="js/art.js?v=3"></script>
+  <script src="js/battle.js?v=3"></script>
+  <script src="js/ui.js?v=3"></script>
 </body>
 </html>
