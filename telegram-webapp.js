@@ -1,27 +1,17 @@
-// Telegram Web App integration (minimal)
-(function(){
-  if (!window.Telegram) return;
+// Интеграция с Telegram Mini App: разворачиваем на весь экран, подстраиваем цвета.
+(function () {
+  if (!window.Telegram || !window.Telegram.WebApp) return;
   const webApp = window.Telegram.WebApp;
   try {
+    webApp.ready && webApp.ready();
     webApp.expand && webApp.expand();
-    console.log('Telegram WebApp initialized', webApp.initDataUnsafe && webApp.initDataUnsafe.user);
-
-    // Hook a MainButton to send results and close
-    if (webApp.MainButton) {
-      webApp.MainButton.text = 'Return to Telegram';
-      webApp.MainButton.show();
-      webApp.MainButton.onClick(() => {
-        webApp.sendData(JSON.stringify({ type: 'returned', ts: Date.now() }));
-        webApp.close();
-      });
-    }
-
-    // Expose helper to send match result
-    window.sendMatchResultToBot = function(result) {
-      try {
-        webApp.sendData(JSON.stringify(result));
-        console.log('Sent match result to bot:', result);
-      } catch(e) { console.warn('Failed to send data to bot', e); }
-    }
-  } catch(e) { console.warn('Telegram WebApp integration error', e); }
+    if (webApp.disableVerticalSwipes) webApp.disableVerticalSwipes();
+    if (webApp.setHeaderColor) webApp.setHeaderColor('#0b0716');
+    if (webApp.setBackgroundColor) webApp.setBackgroundColor('#0b0716');
+    if (webApp.MainButton) webApp.MainButton.hide();
+    // Отправка результата матча боту (закрывает Mini App — вызывать только по желанию игрока)
+    window.sendMatchResultToBot = function (result) {
+      try { webApp.sendData(JSON.stringify(result)); } catch (e) { console.warn('Failed to send data to bot', e); }
+    };
+  } catch (e) { console.warn('Telegram WebApp integration error', e); }
 })();
