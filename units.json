@@ -90,6 +90,38 @@
       "cooldown": 2,
       "proj": "crow",
       "color": "#8ab4ff"
+    },
+    {
+      "id": "sniper",
+      "name": "Снайперша",
+      "role": "Охотница",
+      "tier": "A",
+      "description": "Быстрая пуля почти по прямой. Огромный урон по юнитам, слабый — по стенам.",
+      "hp": 65,
+      "blockDmg": 25,
+      "unitDmg": 95,
+      "radius": 16,
+      "grav": 0.4,
+      "speed": 1.2,
+      "cooldown": 2,
+      "proj": "bolt",
+      "color": "#ffe066"
+    },
+    {
+      "id": "storm",
+      "name": "Грозовая",
+      "role": "Цепная молния",
+      "tier": "S",
+      "description": "Шар-молния: после взрыва бьёт разрядом до 3 ближайших врагов.",
+      "hp": 75,
+      "blockDmg": 40,
+      "unitDmg": 40,
+      "radius": 44,
+      "chain": 3,
+      "chainDmg": 35,
+      "cooldown": 2,
+      "proj": "orb",
+      "color": "#7df9ff"
     }
   ]
 }

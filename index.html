@@ -35,8 +35,9 @@
       <div class="menu-row">
         <button class="btn btn-ghost" id="btnBuild">Замок</button>
         <button class="btn btn-ghost" id="btnSquad">Отряд</button>
-        <button class="btn btn-ghost" id="btnHelp">Как играть</button>
+        <button class="btn btn-ghost" id="btnArsenal">Арсенал</button>
       </div>
+      <button class="btn btn-ghost" id="btnHelp">Как играть</button>
     </div>
   </section>
 
@@ -83,7 +84,21 @@
         <div class="res sm"><span class="ico ico-gold"></span><b class="vGold">0</b></div>
       </div>
     </header>
+    <div class="swap-bar" id="squadSwapBar"><span id="squadSwapText"></span><button class="btn btn-ghost" id="btnSwapCancel">Отмена</button></div>
     <div id="squadList" class="squad-list"></div>
+  </section>
+
+  <!-- ===== ARSENAL ===== -->
+  <section id="arsenal" class="screen">
+    <header class="sub-head">
+      <button class="btn-back" data-go="menu" aria-label="Назад">‹</button>
+      <h2>Арсенал</h2>
+      <div class="res-row">
+        <div class="res sm"><span class="ico ico-gold"></span><b class="vGold">0</b></div>
+      </div>
+    </header>
+    <p class="arsenal-note">Особое оружие стреляет вместо обычного снаряда выбранного бойца и не тратит его перезарядку. Один заряд — один выстрел.</p>
+    <div id="arsenalList" class="squad-list"></div>
   </section>
 
   <!-- ===== BATTLE ===== -->
@@ -117,6 +132,14 @@
       <button class="tool" id="btnQuit" aria-label="Сдаться">Выйти</button>
     </div>
     <button class="btn btn-primary act-btn" id="btnAction">ИСЦЕЛИТЬ</button>
+    <div class="hud-weapons">
+      <div class="drive">
+        <button class="dbtn" id="btnLeft" aria-label="Ехать назад">◀</button>
+        <div class="fuel" title="Топливо"><i id="fuelBar"></i></div>
+        <button class="dbtn" id="btnRight" aria-label="Ехать вперёд">▶</button>
+      </div>
+      <div class="wbar" id="weaponBar"></div>
+    </div>
     <div class="hud-bottom" id="unitBar"></div>
     <div class="hint-drag" id="dragHint">Оттяни палец назад, чтобы прицелиться — отпусти, чтобы выстрелить</div>
   </section>
@@ -141,10 +164,31 @@
         <li><b>Выбери юнита</b> внизу экрана — у каждого свой снаряд и перезарядка.</li>
         <li><b>Оттяни палец назад</b> (как рогатку): чем длиннее — тем сильнее. Пунктир покажет траекторию.</li>
         <li><b>Отпусти</b> — выстрел. Сноси опоры: блоки без опоры обрушиваются вместе с юнитами.</li>
+        <li><b>Замок врага</b> виден в окне справа вверху — там же точки траектории. Нажмите на окно, чтобы увидеть всё поле.</li>
+        <li><b>◀ ▶</b> — двигайте замок на гусеницах, чтобы уйти из-под огня или подъехать ближе. Топливо восстанавливается каждый ход.</li>
+        <li><b>Оружие</b> над отрядом: кластер, ракета, лазер, заморозка и щит. Заряды покупаются в «Арсенале».</li>
         <li><b>Побеждает</b> тот, кто уничтожит всех юнитов врага или его замок. После 24 раундов — у кого замок целее.</li>
         <li>Между боями трать <b>дерево и золото</b> на постройку и улучшение замка и прокачку отряда.</li>
       </ol>
       <button class="btn btn-primary" data-close>Понятно</button>
+    </div>
+  </div>
+
+  <div class="modal" id="prepModal">
+    <div class="card prep">
+      <h3>Подготовка к бою</h3>
+      <div class="prep-label">Ваш отряд</div>
+      <div class="prep-slots" id="prepSlots"></div>
+      <div class="prep-label">Все бойцы</div>
+      <div class="prep-roster" id="prepRoster"></div>
+      <p class="res-sub" id="prepInfo"></p>
+      <div class="prep-label">Оружие</div>
+      <div class="prep-arsenal" id="prepArsenal"></div>
+      <div class="menu-row">
+        <button class="btn btn-primary" id="btnPrepGo">В БОЙ</button>
+        <button class="btn btn-ghost" id="btnPrepSquad">Прокачка</button>
+      </div>
+      <button class="btn-x" data-close aria-label="Закрыть">×</button>
     </div>
   </div>
 
